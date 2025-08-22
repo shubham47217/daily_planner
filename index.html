@@ -1,242 +1,475 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Day Planner with Timer</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day Planner — Plan Tasks, Grouped by Day</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #111827;
-      color: white;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
+    :root{
+      --bg:#0b1220;           /* deep navy */
+      --bg2:#0e1526;          /* card backdrop */
+      --panel:#0f1a31;        /* side panel */
+      --text:#e7f0ff;         /* primary text */
+      --muted:#b6c3da;        /* secondary text */
+      --primary:#1f9cf0;      /* bright blue */
+      --primary-2:#0b7cca;
+      --green:#26b37a;
+      --amber:#c98900;
+      --teal:#0ea5a5;
+      --red:#d44a4a;
+      --chip:#0c1e33;         /* pill bg */
+      --chip-2:#0b1a2b;
+      --shadow: 0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.02);
+      --radius:16px;
     }
-    h1 {
-      margin: 20px 0;
-      font-size: 2rem;
-      color: #38bdf8;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--text);
+      background: radial-gradient(1200px 900px at 20% -10%, #12213e 0%, rgba(18,33,62,0) 60%),
+                  radial-gradient(800px 600px at 100% 0%, #081326 0%, rgba(8,19,38,0) 50%),
+                  var(--bg);
+      letter-spacing:.2px;
     }
-    .task-container {
-      width: 95%;
-      max-width: 800px;
-    }
-    .day-group {
-      margin-bottom: 30px;
-      border: 1px solid #333;
-      border-radius: 12px;
-      padding: 15px;
-      background: #1f2937;
-    }
-    .day-title {
-      font-size: 1.3rem;
-      margin-bottom: 10px;
-      color: #fbbf24;
-    }
-    .task {
-      background: #111;
-      margin: 10px 0;
-      padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-    }
-    .task h3 { margin: 0; }
-    .info { font-size: 0.9rem; color: #bbb; margin: 4px 0; }
-    .status { font-weight: bold; margin-top: 8px; }
-    .controls button {
-      margin: 5px;
-      padding: 8px 14px;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .start { background: #22c55e; color: black; }
-    .reset, .edit { background: #374151; color: white; }
-    .done { background: #4ade80; color: black; }
-    .delete { background: #ef4444; color: white; }
-    .stop-alarm { background: #facc15; color: black; }
+    .container{max-width:1100px;margin:28px auto;padding:0 16px;display:grid;grid-template-columns:1fr 320px;gap:20px}
+    header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between}
+    h1{font-size:26px;margin:0;font-weight:800;letter-spacing:.4px}
+    h1 .em{opacity:.9}
+    .btn{display:inline-flex;align-items:center;gap:8px;border:none;background:var(--chip);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;box-shadow:var(--shadow);font-weight:700}
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{background:linear-gradient(180deg, var(--primary), var(--primary-2))}
+    .btn.danger{background:linear-gradient(180deg, #c53333, #a72828)}/* left column */
+.composer{background:rgba(255,255,255,0.02);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.row{display:flex;gap:12px;margin-bottom:10px}
+.row input[type="text"]{flex:1;background:var(--chip-2);border:1px solid #19314e;color:var(--text);padding:12px 14px;border-radius:12px;outline:none}
+.row input[type="number"]{width:92px;background:var(--chip-2);border:1px solid #19314e;color:var(--text);padding:12px 10px;border-radius:12px;outline:none}
+.row input[type="datetime-local"]{width:220px;background:var(--chip-2);border:1px solid #19314e;color:var(--muted);padding:12px 10px;border-radius:12px;outline:none}
+.row .add{padding:12px 14px;background:linear-gradient(180deg,#18b16a,#13915a);border-radius:12px;border:none;color:#eafff6;font-weight:800;box-shadow:var(--shadow);cursor:pointer;white-space:nowrap}
+
+.hint{margin-top:4px;color:var(--muted);font-size:13px;opacity:.9}
+
+.content{display:grid;grid-template-columns:1fr 320px;gap:20px}
+
+/* right column */
+.panel{background:var(--panel);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.panel h3{margin:0 0 12px 0;font-size:16px;opacity:.95}
+.stats{display:grid;grid-template-columns:1fr;gap:6px;color:var(--muted)}
+.stats .row2{display:flex;justify-content:space-between;background:rgba(255,255,255,.02);padding:10px;border-radius:10px}
+.panel .actions{display:flex;gap:10px;margin-top:14px}
+.panel .actions .btn{flex:1;justify-content:center;background:linear-gradient(180deg,#1d2338,#141a2d)}
+
+/* day group */
+.day{margin-top:22px}
+.day h2{font-size:14px;color:#9fb6d9;margin:0 0 10px 4px}
+
+/* task card */
+.card{background:linear-gradient(180deg, #0f1a31, #0c1628);border-radius:18px;padding:14px 14px 12px 14px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.card h4{margin:0 0 2px 0;font-size:16px;font-weight:800}
+.card .meta{font-size:12px;color:#8aa2c6;margin-bottom:10px}
+.pills{display:flex;gap:10px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:8px;background:var(--chip);padding:8px 12px;border-radius:999px;font-weight:800;font-size:12px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.pill .icon{font-weight:900}
+.pill.amber{background:linear-gradient(180deg,#3a2a00,#2d2100)}
+.pill.teal{background:linear-gradient(180deg,#063b3b,#082f2f)}
+.pill.limit{background:linear-gradient(180deg,#0a1b30,#081525)}
+.pill.fail{background:linear-gradient(180deg,#3a0d0d,#2a0a0a);color:#ffd9d9}
+
+.controls{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap}
+.control{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:800;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);background:#0f2139;color:#e7f0ff}
+.control.good{background:#10442d}
+.control.warn{background:#3a2a00}
+.control.danger{background:#4a1515}
+
+.right{position:absolute;right:12px;bottom:12px;opacity:.25}
+
+@media (max-width: 980px){
+  .container, .content{grid-template-columns:1fr}
+  .panel{order:2}
+}
+
   </style>
 </head>
 <body>
-  <h1>Day Planner</h1>
-
-  <div style="margin-bottom:20px;">
-    <input id="taskName" placeholder="Task name"> 
-    <input id="duration" type="number" placeholder="Minutes" style="width:90px;"> 
-    <button onclick="addTask()">Add Task</button>
-    <button onclick="clearAllTasks()">Clear All</button>
-    <button onclick="enableAlarm()">Enable Alarm</button>
+  <div class="container">
+    <header>
+      <h1>Day Planner ⏱ — <span class="em">Plan Tasks, Grouped by Day</span></h1>
+      <div style="display:flex; gap:10px;">
+        <button id="alarmBtn" class="btn primary">🔔 Alarm Ready</button>
+        <button id="clearAll" class="btn danger">🧹 Clear All</button>
+      </div>
+    </header><!-- LEFT: composer + list -->
+<div>
+  <div class="composer">
+    <div class="row">
+      <input id="titleInput" type="text" placeholder="Task title (optional)" />
+      <input id="durationInput" type="number" min="1" value="25" />
+      <input id="startAtInput" type="datetime-local" placeholder="dd - mm - yyyy — : - :" />
+      <button id="addBtn" class="add">＋ Add Task</button>
+    </div>
+    <div class="hint">If you provide a start time the task will auto-start at that time. Otherwise press Start on the task card to begin.</div>
   </div>
 
-  <div id="taskContainer" class="task-container"></div>
+  <div id="list"></div>
+</div>
 
-  <audio id="alarmSound">
-    <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
-  </audio>
+<!-- RIGHT: stats -->
+<aside class="panel">
+  <h3>Overview</h3>
+  <div class="stats">
+    <div class="row2"><span>Total tasks</span><strong id="statTotal">0</strong></div>
+    <div class="row2"><span>Running</span><strong id="statRunning">0</strong></div>
+    <div class="row2"><span>Failed</span><strong id="statFailed">0</strong></div>
+  </div>
+  <div class="actions">
+    <button id="exportBtn" class="btn">⬇ Export</button>
+    <button id="importBtn" class="btn">⬆ Import</button>
+    <input id="importFile" type="file" accept="application/json" style="display:none" />
+  </div>
+</aside>
 
-  <script>
-    let tasks = JSON.parse(localStorage.getItem('tasks')||'[]');
-    let alarmEnabled = false;
-    const alarmSound = document.getElementById("alarmSound");
+  </div>  <template id="taskCardTpl">
+    <div class="card" data-id>
+      <h4 class="tTitle">Untitled task</h4>
+      <div class="meta tMeta"></div>
+      <div class="pills">
+        <div class="pill amber"><span class="icon">⏳</span><span>Remaining: <b class="tRemain">00:00</b></span></div>
+        <div class="pill teal"><span class="icon">⏱</span><span>Elapsed: <b class="tElapsed">00:00</b></span></div>
+        <div class="pill limit"><span class="icon">⏲</span><span>Limit: <b class="tLimit">00:00</b></span></div>
+        <div class="pill fail tFail" style="display:none"><b>FAILED</b></div>
+      </div>
+      <div class="controls">
+        <button class="control tStart">▶ Start</button>
+        <button class="control warn tReset">↩ Reset</button>
+        <button class="control good tDone">✅ Done</button>
+        <button class="control tEdit">✏ Edit</button>
+        <button class="control danger tDelete">🗑 Delete</button>
+      </div>
+      <div class="right">⋯</div>
+    </div>
+  </template>  <script>
+    /*******************
+     * Persistence
+     *******************/
+    const LS_KEY = 'dp_tasks_v1';
+    const state = {
+      tasks: loadTasks(),
+      timers: new Map(),        // id -> interval
+      alarmEnabled: false,
+      audioCtx: null
+    };
 
-    function enableAlarm(){
-      alarmEnabled = true;
-      alarmSound.play().then(()=>{alarmSound.pause();alarmSound.currentTime=0;});
-      alert("Alarm enabled! It will play when time is over.");
-    }
+    function save(){ localStorage.setItem(LS_KEY, JSON.stringify(state.tasks)); updateStats(); }
+    function loadTasks(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch(e){ return []; } }
+    function uid(){ return Math.random().toString(36).slice(2)+Date.now().toString(36); }
 
-    function addTask(){
-      const name=document.getElementById("taskName").value||"Untitled";
-      const duration=parseInt(document.getElementById("duration").value)||1;
-      const id=Date.now();
-      const task={id,name,duration,status:"idle",elapsed:0};
-      tasks.push(task);
-      saveTasks();
-      renderTasks();
-    }
+    /*******************
+     * Utilities
+     *******************/
+    const fmt = n => String(n).padStart(2,'0');
+    function secToMMSS(sec){ sec = Math.max(0, Math.floor(sec)); const m=Math.floor(sec/60), s=sec%60; return ${fmt(m)}:${fmt(s)}; }
+    function dayKey(ts){ const d=new Date(ts); return ${d.getFullYear()}-${fmt(d.getMonth()+1)}-${fmt(d.getDate())}; }
+    function niceDate(ts){ const d=new Date(ts); return d.toLocaleString(); }
+    function prettyDayHeader(key){ const [y,m,d]=key.split('-'); return ${parseInt(m)}/${parseInt(d)}/${y}; }
 
-    function clearAllTasks(){
-      if(confirm("Clear all tasks?")){
-        tasks=[];
-        saveTasks();
-        renderTasks();
+    /*******************
+     * Rendering
+     *******************/
+    const listEl = document.getElementById('list');
+
+    function render(){
+      listEl.innerHTML = '';
+      // group by day (createdAt)
+      const groups = {};
+      for(const t of state.tasks){
+        const k = dayKey(t.createdAt);
+        (groups[k] ||= []).push(t);
       }
+      const keys = Object.keys(groups).sort((a,b)=> b.localeCompare(a)); // newest day first
+
+      for(const k of keys){
+        const dayWrap = document.createElement('div');
+        dayWrap.className = 'day';
+        const h = document.createElement('h2');
+        h.textContent = prettyDayHeader(k);
+        dayWrap.appendChild(h);
+
+        for(const t of groups[k]){
+          dayWrap.appendChild(renderCard(t));
+        }
+        listEl.appendChild(dayWrap);
+      }
+      updateStats();
     }
 
-    function saveTasks(){
-      localStorage.setItem('tasks',JSON.stringify(tasks));
+    function renderCard(task){
+      const tpl = document.getElementById('taskCardTpl');
+      const node = tpl.content.firstElementChild.cloneNode(true);
+      node.dataset.id = task.id;
+      node.querySelector('.tTitle').textContent = task.title || 'Untitled task';
+      node.querySelector('.tMeta').textContent = niceDate(task.createdAt);
+      node.querySelector('.tLimit').textContent = secToMMSS(task.limitSec);
+      const remainEl = node.querySelector('.tRemain');
+      const elapsedEl = node.querySelector('.tElapsed');
+      const failPill = node.querySelector('.tFail');
+
+      function paint(){
+        remainEl.textContent = secToMMSS(Math.max(0, task.limitSec - task.elapsedSec));
+        elapsedEl.textContent = secToMMSS(task.elapsedSec);
+        failPill.style.display = task.status === 'failed' ? 'inline-flex' : 'none';
+      }
+      paint();
+
+      const startBtn = node.querySelector('.tStart');
+      const resetBtn = node.querySelector('.tReset');
+      const doneBtn  = node.querySelector('.tDone');
+      const editBtn  = node.querySelector('.tEdit');
+      const delBtn   = node.querySelector('.tDelete');
+
+      function setRunningUI(isRunning){
+        startBtn.textContent = isRunning ? '⏸ Pause' : '▶ Start';
+      }
+      setRunningUI(task.running);
+
+      startBtn.addEventListener('click',()=>{
+        if(task.running){ pauseTask(task.id); }
+        else{ startTask(task.id); }
+      });
+      resetBtn.addEventListener('click',()=>{ resetTask(task.id); });
+      doneBtn.addEventListener('click',()=>{ completeTask(task.id); });
+      editBtn.addEventListener('click',()=>{ editTask(task.id); });
+      delBtn.addEventListener('click',()=>{ deleteTask(task.id); });
+
+      // store painters for live updates
+      node.__paint = paint;
+      node.__setRun = setRunningUI;
+
+      // attach for quick lookups
+      node.id = 'task-'+task.id;
+
+      // auto-start visual if scheduled
+      if(task.running) scheduleTick(task.id);
+      return node;
+    }
+
+    function updateCardView(id){
+      const task = state.tasks.find(t=>t.id===id);
+      const node = document.getElementById('task-'+id);
+      if(task && node){
+        node.querySelector('.tTitle').textContent = task.title || 'Untitled task';
+        node.querySelector('.tLimit').textContent = secToMMSS(task.limitSec);
+        node._paint && node._paint();
+        node._setRun && node._setRun(task.running);
+      }
+      updateStats();
+    }
+
+    /*******************
+     * Task operations
+     *******************/
+    function addTask({title, durationMin, startAt}){
+      const id = uid();
+      const t = {
+        id,
+        title: (title||'').trim(),
+        createdAt: Date.now(),
+        elapsedSec: 0,
+        limitSec: Math.max(60, Math.floor(durationMin*60) || 1500),
+        running: false,
+        status: 'pending', // pending|running|done|failed
+        startAt: startAt || null
+      };
+      state.tasks.unshift(t);
+      save();
+      render();
+
+      if(t.startAt){
+        scheduleAutoStart(t);
+      }
+      return t.id;
     }
 
     function startTask(id){
-      const task=tasks.find(t=>t.id===id);
-      if(task){
-        task.status="running";
-        task.start=Date.now();
-        task.end=task.start+task.duration*60000;
-        saveTasks();
-        renderTasks();
-      }
+      const t = state.tasks.find(x=>x.id===id); if(!t) return;
+      if(t.status==='done') return;
+      t.running = true; t.status = 'running';
+      t._lastTick = Date.now();
+      scheduleTick(id);
+      save();
+      updateCardView(id);
+    }
+
+    function pauseTask(id){
+      const t = state.tasks.find(x=>x.id===id); if(!t) return;
+      t.running = false;
+      clearInterval(state.timers.get(id));
+      state.timers.delete(id);
+      save();
+      updateCardView(id);
     }
 
     function resetTask(id){
-      const task=tasks.find(t=>t.id===id);
-      if(task){
-        task.status="idle";
-        task.elapsed=0;
-        delete task.start;
-        delete task.end;
-        saveTasks();
-        renderTasks();
-      }
-      stopAlarm();
+      const t = state.tasks.find(x=>x.id===id); if(!t) return;
+      t.elapsedSec = 0; t.status = 'pending';
+      pauseTask(id);
+      save();
+      updateCardView(id);
     }
 
-    function stopAlarm(){
-      alarmSound.pause();
-      alarmSound.currentTime=0;
+    function completeTask(id){
+      const t = state.tasks.find(x=>x.id===id); if(!t) return;
+      t.status = 'done';
+      pauseTask(id);
+      save();
+      updateCardView(id);
     }
 
     function deleteTask(id){
-      tasks=tasks.filter(t=>t.id!==id);
-      saveTasks();
-      renderTasks();
-    }
-
-    function doneTask(id){
-      const task=tasks.find(t=>t.id===id);
-      if(task){
-        task.status="done";
-        saveTasks();
-        renderTasks();
-      }
-      stopAlarm();
+      pauseTask(id);
+      state.tasks = state.tasks.filter(x=>x.id!==id);
+      save();
+      render();
     }
 
     function editTask(id){
-      const task=tasks.find(t=>t.id===id);
-      if(!task) return;
-      const newName=prompt("Task name",task.name);
-      const newDur=parseInt(prompt("Duration (minutes)",task.duration));
-      if(newName) task.name=newName;
-      if(newDur) task.duration=newDur;
-      saveTasks();
-      renderTasks();
+      const t = state.tasks.find(x=>x.id===id); if(!t) return;
+      const title = prompt('Edit title', t.title || 'Untitled task');
+      if(title===null) return;
+      const mins = parseInt(prompt('Set duration (minutes)', Math.round(t.limitSec/60))||'');
+      if(!isNaN(mins) && mins>0){ t.limitSec = mins*60; }
+      t.title = title.trim();
+      save();
+      updateCardView(id);
     }
 
-    function renderTasks(){
-      const container=document.getElementById("taskContainer");
-      container.innerHTML="";
-      const grouped={};
-      tasks.forEach(t=>{
-        const day=new Date(t.id).toLocaleDateString();
-        if(!grouped[day]) grouped[day]=[];
-        grouped[day].push(t);
-      });
-      for(const day in grouped){
-        const group=document.createElement("div");
-        group.className="day-group";
-        const title=document.createElement("div");
-        title.className="day-title";
-        title.textContent=day;
-        group.appendChild(title);
-        grouped[day].forEach(task=>{
-          const div=document.createElement("div");
-          div.className="task";
-          const now=Date.now();
-          let remain,elapsed;
-          if(task.status==="running"){
-            remain=Math.max(0,Math.floor((task.end-now)/1000));
-            elapsed=Math.floor((now-task.start)/1000);
-            if(remain<=0){
-              task.status="failed";
-              if(alarmEnabled){alarmSound.play();}
-            }
-          }else if(task.status==="done"){
-            remain=0;elapsed=task.duration*60;
+    function scheduleTick(id){
+      clearInterval(state.timers.get(id));
+      const t = state.tasks.find(x=>x.id===id); if(!t) return;
+      const h = setInterval(()=>{
+        if(!t.running) return;
+        const now = Date.now();
+        const dt = Math.floor((now - (t._lastTick||now))/1000);
+        t._lastTick = now;
+        if(dt>0){
+          t.elapsedSec += dt;
+          if(t.elapsedSec >= t.limitSec){
+            t.elapsedSec = t.limitSec;
+            t.status = 'failed';
+            t.running = false;
+            clearInterval(h); state.timers.delete(id);
+            ring();
+          }
+          save();
+          const node = document.getElementById('task-'+id);
+          if(node && node._paint) node._paint();
+          updateStats();
+        }
+      }, 1000);
+      state.timers.set(id, h);
+    }
+
+    function scheduleAutoStart(t){
+      const wait = new Date(t.startAt).getTime() - Date.now();
+      if(wait <= 0){ startTask(t.id); return; }
+      setTimeout(()=> startTask(t.id), wait);
+    }
+
+    /*******************
+     * Stats
+     *******************/
+    function updateStats(){
+      const total = state.tasks.length;
+      const running = state.tasks.filter(t=>t.running).length;
+      const failed = state.tasks.filter(t=>t.status==='failed').length;
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statRunning').textContent = running;
+      document.getElementById('statFailed').textContent = failed;
+    }
+
+    /*******************
+     * Alarm / Audio
+     *******************/
+    function ensureAudio(){
+      if(!state.audioCtx){ state.audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
+      return state.audioCtx;
+    }
+    function ring(){
+      if(!state.alarmEnabled) return;
+      const ctx = ensureAudio();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type='triangle'; o.frequency.value=880; g.gain.value=.05; o.connect(g); g.connect(ctx.destination); o.start();
+      setTimeout(()=>{o.stop();}, 800);
+    }
+
+    /*******************
+     * Wiring UI
+     *******************/
+    document.getElementById('addBtn').addEventListener('click', ()=>{
+      const title = document.getElementById('titleInput').value;
+      const durationMin = parseInt(document.getElementById('durationInput').value || '25');
+      const startAtStr = document.getElementById('startAtInput').value;
+      const startAt = startAtStr ? new Date(startAtStr).toISOString() : null;
+      addTask({title, durationMin, startAt});
+      // clear title only
+      document.getElementById('titleInput').value='';
+    });
+
+    document.getElementById('clearAll').addEventListener('click',()=>{
+      if(!confirm('Clear all tasks?')) return;
+      // stop timers
+      for(const [id, h] of state.timers){ clearInterval(h); }
+      state.timers.clear();
+      state.tasks = [];
+      save();
+      render();
+    });
+
+    document.getElementById('alarmBtn').addEventListener('click', async ()=>{
+      try{ ensureAudio(); await state.audioCtx.resume(); }catch(e){}
+      state.alarmEnabled = true;
+      const btn = document.getElementById('alarmBtn');
+      btn.textContent = '🔔 Alarm Ready';
+      btn.classList.add('primary');
+    });
+
+    document.getElementById('exportBtn').addEventListener('click',()=>{
+      const data = JSON.stringify(state.tasks, null, 2);
+      const blob = new Blob([data], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'day_planner_tasks.json'; a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('importBtn').addEventListener('click',()=>{
+      document.getElementById('importFile').click();
+    });
+
+    document.getElementById('importFile').addEventListener('change', (e)=>{
+      const file = e.target.files[0]; if(!file) return;
+      const rd = new FileReader();
+      rd.onload = ()=>{
+        try{
+          const arr = JSON.parse(rd.result);
+          if(Array.isArray(arr)){
+            // basic sanitization
+            for(const t of arr){ t.id = t.id || uid(); t.createdAt = t.createdAt || Date.now(); t.elapsedSec = t.elapsedSec|0; t.limitSec = t.limitSec|0; t.running = false; }
+            state.tasks = arr;
+            save();
+            render();
           }else{
-            remain=task.duration*60-task.elapsed;
-            elapsed=task.elapsed;
+            alert('Invalid file');
           }
-          div.innerHTML=`<h3>${task.name}</h3>
-            <div class="info">Limit: ${task.duration}m</div>
-            ${task.start?`<div class="info">Started: ${new Date(task.start).toLocaleTimeString()}</div>`:"<div class=\"info\">Not started yet</div>"}
-            ${task.end?`<div class="info">Ends: ${new Date(task.end).toLocaleTimeString()}</div>`:""}
-            <div class="info">Remaining: ${String(Math.floor(remain/60)).padStart(2,'0')}:${String(remain%60).padStart(2,'0')}</div>
-            <div class="info">Elapsed: ${String(Math.floor(elapsed/60)).padStart(2,'0')}:${String(elapsed%60).padStart(2,'0')}</div>
-            <div class="status">${task.status.toUpperCase()}</div>`;
+        }catch(e){ alert('Failed to import'); }
+      };
+      rd.readAsText(file);
+      e.target.value='';
+    });
 
-          const controls=document.createElement("div");
-          controls.className="controls";
-          if(task.status==="idle"){
-            const s=document.createElement("button");s.className="start";s.innerHTML="▶ Start";s.onclick=()=>startTask(task.id);controls.appendChild(s);
-          }
-          if(task.status==="running"){
-            const r=document.createElement("button");r.className="reset";r.innerHTML="↺ Reset";r.onclick=()=>resetTask(task.id);controls.appendChild(r);
-          }
-          if(task.status==="failed"){
-            const stop=document.createElement("button");stop.className="stop-alarm";stop.innerHTML="⏹ Stop Alarm";stop.onclick=()=>stopAlarm();controls.appendChild(stop);
-          }
-          const d=document.createElement("button");d.className="done";d.innerHTML="✔ Done";d.onclick=()=>doneTask(task.id);controls.appendChild(d);
-          const e=document.createElement("button");e.className="edit";e.innerHTML="✎ Edit";e.onclick=()=>editTask(task.id);controls.appendChild(e);
-          const del=document.createElement("button");del.className="delete";del.innerHTML="🗑 Delete";del.onclick=()=>deleteTask(task.id);controls.appendChild(del);
-          div.appendChild(controls);
-          group.appendChild(div);
-        });
-        container.appendChild(group);
-      }
-      saveTasks();
-    }
+    // Initial render
+    render();
 
-    setInterval(renderTasks,1000);
-    renderTasks();
-  </script>
-</body>
+    // Auto-start for scheduled tasks after reload
+    for(const t of state.tasks){ if(t.startAt){ scheduleAutoStart(t); } }
+  </script></body>
 </html>
