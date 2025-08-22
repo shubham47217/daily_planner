@@ -1,242 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Day Planner — Grouped by Day</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day Planner</title>
   <style>
-    :root{--bg:#071021;--card:#071722;--muted:#9aa8bf;--text:#e6eef8;--green:#16a34a;--red:#ef4444;--accent:#06b6d4}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#020617,#07101a);color:var(--text);-webkit-font-smoothing:antialiased;padding:18px}
-    header{max-width:1100px;margin:0 auto 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-    h1{font-size:20px;margin:0}
-    .controls{display:flex;gap:8px;flex-wrap:wrap}
-    .btn{border:0;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-    .btn-blue{background:#075985;color:white}
-    .btn-red{background:#991b1b;color:white}
-    .btn-green{background:#0ea5a4;color:#02120f}
-    .panel{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 360px;gap:18px}
-    @media(max-width:980px){.panel{grid-template-columns:1fr}header{flex-direction:column;align-items:flex-start}}
-
-    /* New task form */
-    .form-card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.03)}
-    .row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-    input,select{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)}
-    input[type=number]{width:120px}
-
-    /* Board */
-    .date-group{margin-bottom:18px}
-    .date-header{font-weight:800;margin:6px 0}
-    .task-card{background:linear-gradient(180deg,#071219,#0b1722);border-radius:12px;padding:12px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.03);display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
-    .task-title{font-weight:800;font-size:16px}
-    .meta{font-size:12px;color:var(--muted)}
-    .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-    .pill{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.02);font-weight:800;font-size:13px;border:1px solid rgba(255,255,255,0.03)}
-    .pill-rem{background:linear-gradient(90deg,#5c3500,#7a4b00);color:#fff}
-    .pill-el{background:linear-gradient(90deg,#023430,#06403a);color:#dfffe8}
-    .pill-limit{background:rgba(255,255,255,0.02)}
-    .pill-status-idle{background:linear-gradient(90deg,#0f172a,#0b2440);color:#dbeafe}
-    .pill-status-expired{background:linear-gradient(90deg,#3b0b0b,#6b1b1b);color:#ffecec}
-
-    .actions{display:flex;gap:8px;align-items:center}
-    .icon-btn{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 12px;border-radius:10px;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-    .icon-btn.green{background:linear-gradient(90deg,#06d6a0,#16a34a);color:#02120f}
-    .icon-btn.red{background:linear-gradient(90deg,#ef4444,#b91c1c);color:#fff}
-    .icon-btn.gray{background:rgba(255,255,255,0.02)}
-
-    /* side */
-    .side{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.03)}
-    .stat{display:flex;justify-content:space-between;margin-bottom:8px}
-
-    .small-muted{color:var(--muted);font-size:13px}
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      text-align: center;
+      padding: 1rem;
+      background: #111;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+    .task-input {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .task-input input {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      flex: 1;
+    }
+    .task-input button {
+      background: #28a745;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .day-group {
+      margin-top: 20px;
+    }
+    .day-group h2 {
+      border-bottom: 2px solid #555;
+      padding-bottom: 5px;
+    }
+    .task {
+      background: #1e1e1e;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      box-shadow: 0 0 5px #444;
+    }
+    .task.running { border-left: 5px solid #28a745; }
+    .task.expired, .task.failed { border-left: 5px solid #dc3545; }
+    .task.done { border-left: 5px solid #007bff; }
+    .task-header {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .task-details {
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: #ddd;
+    }
+    .buttons {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .buttons button {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .start { background: #28a745; color: #fff; }
+    .pause { background: #ffc107; color: #000; }
+    .reset { background: #17a2b8; color: #fff; }
+    .done { background: #007bff; color: #fff; }
+    .delete { background: #dc3545; color: #fff; }
+    .stopalarm { background: #ff5722; color: #fff; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Day Planner ⏱️ — Plan Tasks, Grouped by Day</h1>
-    <div class="controls">
-      <button id="enableSound" class="btn btn-blue">🔊 Enable Alarm</button>
-      <button id="stopAlarm" class="btn btn-red" style="display:none">🔇 Stop Alarm</button>
-      <button id="clearAll" class="btn" style="background:#7c1d1d;color:#fff">🧹 Clear All</button>
+  <header>📅 Day Planner</header>
+  <div class="container">
+    <div class="task-input">
+      <input type="text" id="title" placeholder="Task title (optional)">
+      <input type="number" id="limit" placeholder="Time limit (minutes)" min="1">
+      <input type="time" id="startTime">
+      <button onclick="addTask()">➕ Add</button>
     </div>
-  </header>
-
-  <div class="panel">
-    <main>
-      <div class="form-card">
-        <div class="row">
-          <input id="title" type="text" placeholder="Task title (optional)" />
-          <input id="minutes" type="number" min="1" value="25" />
-        </div>
-        <div class="row">
-          <input id="startAt" type="datetime-local" />
-          <button id="addBtn" class="btn btn-green">➕ Add Task</button>
-        </div>
-        <div class="small-muted">If you provide a start time the task will auto-start at that time. Otherwise press <strong>Start</strong> on the task card to begin.</div>
-      </div>
-
-      <div id="board"></div>
-    </main>
-
-    <aside class="side">
-      <div class="stat"><div class="small-muted">Total tasks</div><div id="total">0</div></div>
-      <div class="stat"><div class="small-muted">Running</div><div id="running">0</div></div>
-      <div class="stat"><div class="small-muted">Failed</div><div id="failed">0</div></div>
-      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:8px 0">
-      <div class="small-muted">Export / Import tasks:</div>
-      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
-        <button id="exportBtn" class="btn">📤 Export</button>
-        <button id="importBtn" class="btn">📥 Import</button>
-      </div>
-    </aside>
+    <div id="tasks"></div>
   </div>
 
-  <audio id="fallbackAudio" preload="auto"><source src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" type="audio/ogg"></audio>
+  <audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
 
   <script>
-    // Utilities
-    const $ = s => document.querySelector(s);
-    const STORE = 'dayplanner.grouped.v1';
-    function uid(){return Math.random().toString(36).slice(2,9)}
-    function now(){return Date.now()}
-    function toDateKey(ts){ const d = new Date(ts); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-    function fmtTime(ts){ const d = new Date(ts); return d.toLocaleString(); }
-    function secFmt(s){ s = Math.max(0, Math.floor(s)); const h=Math.floor(s/3600); const m=Math.floor((s%3600)/60); const sec=s%60; return (h>0?String(h).padStart(2,'0')+':':'') + String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
+    let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+    let timers = {};
 
-    // data
-    let tasks = JSON.parse(localStorage.getItem(STORE) || '[]');
-
-    // audio
-    let audioCtx=null, alarmOsc=null, alarmInterval=null; let audioEnabled=false;
-    const fallback = $('#fallbackAudio');
-
-    function enableAudio(){
-      try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); audioEnabled=true; $('#enableSound').textContent='🔊 Alarm Ready'; }catch(e){ console.warn('WebAudio not available',e); }
-      // prime fallback
-      fallback.play().then(()=>{ fallback.pause(); fallback.currentTime=0; }).catch(()=>{});
-    }
-    function startAlarm(){ if(audioCtx){ if(alarmOsc) return; alarmOsc = audioCtx.createOscillator(); const g = audioCtx.createGain(); alarmOsc.type='square'; alarmOsc.frequency.setValueAtTime(700,audioCtx.currentTime); g.gain.value=0.18; alarmOsc.connect(g).connect(audioCtx.destination); alarmOsc.start(); alarmInterval = setInterval(()=>{ if(!alarmOsc) return; const t = audioCtx.currentTime; alarmOsc.frequency.setValueAtTime(500,t); alarmOsc.frequency.linearRampToValueAtTime(1200,t+0.5); alarmOsc.frequency.linearRampToValueAtTime(500,t+1); },1000); } else { try{ fallback.play().catch(()=>{}); }catch(e){} } $('#stopAlarm').style.display='inline-flex'; }
-    function stopAlarm(){ if(alarmOsc){ try{ alarmOsc.stop(); }catch(e){} alarmOsc.disconnect(); alarmOsc=null; } if(alarmInterval){ clearInterval(alarmInterval); alarmInterval=null; } try{ fallback.pause(); fallback.currentTime=0; }catch(e){} $('#stopAlarm').style.display='none'; }
-
-    // task helpers
-    // Task schema: {id,title,durationSec,createdAt,status('idle'|'scheduled'|'running'|'paused'|'failed'|'done'),startedAt,pausedAccum,alarming,startAtISO}
-
-    function save(){ localStorage.setItem(STORE, JSON.stringify(tasks)); }
-    function elapsed(t){ if(t.status==='running') return Math.floor((now()-t.startedAt)/1000) + (t.pausedAccum||0); return t.pausedAccum||0; }
-    function remaining(t){ return Math.max(0, t.durationSec - elapsed(t)); }
-
-    // create task
-    function addTask(){
-      const title = ($('#title').value || '').trim() || 'Untitled task';
-      const mins = Math.max(1, Number($('#minutes').value) || 25);
-      const startAtVal = $('#startAt').value || null;
-      const t = { id: uid(), title, durationSec: mins*60, createdAt: now(), status: startAtVal? 'scheduled' : 'idle', startedAt: null, pausedAccum:0, alarming:false, startAtISO: startAtVal };
-      tasks.push(t); save(); render();
-      // schedule auto-start if startAt set and in future
-      if(startAtVal){ const startMs = new Date(startAtVal).getTime(); const diff = startMs - now(); if(diff<=0){ startTask(t.id); } else { setTimeout(()=> startTask(t.id), diff); } }
-      // clear inputs
-      $('#title').value=''; $('#minutes').value=25; $('#startAt').value='';
+    function saveTasks() {
+      localStorage.setItem("tasks", JSON.stringify(tasks));
     }
 
-    function startTask(id){ const t = tasks.find(x=>x.id===id); if(!t || t.status==='done' || t.status==='failed') return; if(t.status!=='running'){ t.status='running'; t.startedAt = now(); if(t.pausedAccum) t.startedAt = now() - t.pausedAccum*1000; save(); render(); } }
-    function pauseTask(id){ const t=tasks.find(x=>x.id===id); if(!t || t.status!=='running') return; t.pausedAccum = elapsed(t); t.status='paused'; t.startedAt = null; save(); render(); }
-    function resetTask(id){ const t=tasks.find(x=>x.id===id); if(!t) return; t.status = t.startAtISO? 'scheduled' : 'idle'; t.startedAt = null; t.pausedAccum = 0; t.alarming = false; t.done = false; stopAlarm(); save(); render(); }
-    function doneTask(id){ const t=tasks.find(x=>x.id===id); if(!t) return; t.status = 'done'; t.alarming=false; save(); stopAlarm(); render(); }
-    function deleteTask(id){ tasks = tasks.filter(x=>x.id!==id); save(); render(); }
-    function editTask(id){ const t=tasks.find(x=>x.id===id); if(!t) return; const newTitle = prompt('Edit title', t.title); if(newTitle===null) return; let newMin = prompt('Time limit (minutes)', Math.ceil(t.durationSec/60)); if(newMin===null) return; newMin = Math.max(1, Number(newMin)||25); const wasElapsed = elapsed(t); t.title = newTitle; t.durationSec = newMin*60; t.pausedAccum = Math.min(wasElapsed, t.durationSec); if(t.status==='running') t.startedAt = now(); save(); render(); }
+    function renderTasks() {
+      const container = document.getElementById("tasks");
+      container.innerHTML = "";
+      const grouped = {};
 
-    // render grouped by day
-    function render(){ const board=$('#board'); board.innerHTML=''; if(tasks.length===0){ board.innerHTML='<div class="small-muted">No tasks — add one to begin.</div>'; updateStats(); return; }
-      // group
-      const groups = tasks.reduce((acc,t)=>{ const key = toDateKey(t.createdAt); (acc[key]||(acc[key]=[])).push(t); return acc; },{});
-      const keys = Object.keys(groups).sort((a,b)=>new Date(b) - new Date(a));
-      for(const k of keys){ const arr = groups[k]; const header = document.createElement('div'); header.className='date-group'; const dh = document.createElement('div'); dh.className='date-header'; dh.textContent = new Date(k).toLocaleDateString(); header.appendChild(dh);
-          // tasks for this date
-          arr.sort((a,b)=>b.createdAt - a.createdAt);
-          for(const t of arr) header.appendChild(renderTaskCard(t));
-          board.appendChild(header);
+      tasks.forEach(task => {
+        if (!grouped[task.date]) grouped[task.date] = [];
+        grouped[task.date].push(task);
+      });
+
+      Object.keys(grouped).forEach(date => {
+        const groupDiv = document.createElement("div");
+        groupDiv.className = "day-group";
+        groupDiv.innerHTML = `<h2>${date}</h2>`;
+        grouped[date].forEach(task => {
+          const taskDiv = document.createElement("div");
+          taskDiv.className = `task ${task.status}`;
+          taskDiv.innerHTML = `
+            <div class="task-header">${task.title || "Untitled Task"}</div>
+            <div class="task-details">
+              ⏳ Limit: ${task.limit} min<br>
+              ⏱️ Elapsed: ${Math.floor(task.elapsed/60)}m ${task.elapsed%60}s<br>
+              ⏲️ Remaining: ${task.remaining > 0 ? Math.floor(task.remaining/60)+"m "+task.remaining%60+"s" : "0m 0s"}<br>
+              📌 Status: ${task.status.toUpperCase()}
+            </div>
+            <div class="buttons">
+              ${task.status==="idle"?`<button class="start" onclick="startTask('${task.id}')">Start</button>`:""}
+              ${task.status==="running"?`<button class="pause" onclick="pauseTask('${task.id}')">Pause</button>`:""}
+              ${task.status==="running"||task.status==="paused"?`<button class="reset" onclick="resetTask('${task.id}')">Reset</button>`:""}
+              ${task.status!=="done"?`<button class="done" onclick="doneTask('${task.id}')">Done</button>`:""}
+              <button class="delete" onclick="deleteTask('${task.id}')">Delete</button>
+              ${task.alarming?`<button class="stopalarm" onclick="stopAlarm('${task.id}')">Stop Alarm</button>`:""}
+            </div>
+          `;
+          groupDiv.appendChild(taskDiv);
+        });
+        container.appendChild(groupDiv);
+      });
+    }
+
+    function addTask() {
+      const title = document.getElementById("title").value.trim();
+      const limit = parseInt(document.getElementById("limit").value);
+      const startTime = document.getElementById("startTime").value;
+      if (!limit) return alert("Set a time limit!");
+      const id = Date.now().toString();
+      const today = new Date().toISOString().split("T")[0];
+      const task = {
+        id, title, limit,
+        elapsed: 0,
+        remaining: limit*60,
+        status: "idle",
+        alarming: false,
+        date: today,
+        startTime: startTime || null
+      };
+      tasks.push(task);
+      saveTasks();
+      renderTasks();
+      if (startTime) scheduleAutoStart(task);
+    }
+
+    function scheduleAutoStart(task) {
+      const now = new Date();
+      const [h, m] = task.startTime.split(":").map(Number);
+      const start = new Date();
+      start.setHours(h, m, 0, 0);
+      const delay = start - now;
+      if (delay > 0) {
+        setTimeout(() => startTask(task.id), delay);
+      } else {
+        startTask(task.id);
       }
-      updateStats();
     }
 
-    function renderTaskCard(t){
-      // check auto expiry
-      if((t.status==='running' || t.status==='paused') && remaining(t)<=0 && !t.done){ t.status='failed'; t.alarming=true; }
-      // schedule start if scheduled and time reached
-      if(t.status==='scheduled' && t.startAtISO){ const startMs = new Date(t.startAtISO).getTime(); if(startMs<=now()){ startTask(t.id); } }
-
-      const card = document.createElement('div'); card.className='task-card'; if(t.status==='failed') card.classList.add('expired');
-      const left = document.createElement('div');
-      const title = document.createElement('div'); title.className='task-title'; title.textContent = t.title;
-      const meta = document.createElement('div'); meta.className='meta'; meta.textContent = fmtTime(t.createdAt);
-
-      const pills = document.createElement('div'); pills.className='pills';
-      const rem = document.createElement('div'); rem.className='pill pill-rem'; rem.textContent = '⏳ Remaining: '+secFmt(remaining(t));
-      const el = document.createElement('div'); el.className='pill pill-el'; el.textContent = '⌛ Elapsed: '+secFmt(elapsed(t));
-      const limit = document.createElement('div'); limit.className='pill pill-limit'; limit.textContent = '🎯 Limit: '+secFmt(t.durationSec);
-      const status = document.createElement('div'); status.className='pill ' + (t.status==='failed'? 'pill-status-expired':'pill-status-idle'); status.textContent = '📌 '+(t.status||'idle').toUpperCase();
-      pills.append(rem,el,limit,status);
-      left.append(title,meta,pills);
-
-      const right = document.createElement('div'); right.style.display='flex'; right.style.flexDirection='column'; right.style.alignItems='flex-end'; right.style.gap='8px';
-      const actions = document.createElement('div'); actions.className='actions';
-
-      // Make icon buttons
-      const mk = (html, cls, fn) => { const b = document.createElement('button'); b.className='icon-btn '+(cls||''); b.innerHTML = html; b.onclick = fn; actions.appendChild(b); };
-
-      if(t.status!=='running' && t.status!=='done' && t.status!=='failed') mk('<i class="bi bi-play-fill"></i> Start','green',()=>startTask(t.id));
-      if(t.status==='running') mk('<i class="bi bi-pause-fill"></i> Pause','gray',()=>pauseTask(t.id));
-      mk('<i class="bi bi-arrow-counterclockwise"></i> Reset','gray',()=>resetTask(t.id));
-      mk('<i class="bi bi-check2-circle"></i> Done','green',()=>doneTask(t.id));
-      mk('<i class="bi bi-pencil"></i> Edit','gray',()=>editTask(t.id));
-      mk('<i class="bi bi-trash"></i> Delete','red',()=>deleteTask(t.id));
-      if(t.alarming) mk('<i class="bi bi-bell-slash"></i> Silence','red',()=>{ t.alarming=false; stopAlarm(); save(); render(); });
-
-      right.append(actions);
-
-      // show details when running or scheduled
-      if(t.status==='running' || t.status==='scheduled' || t.startedAt){
-        const started = document.createElement('div'); started.className='small-muted'; started.textContent = t.startedAt ? ('Started: '+ new Date(t.startedAt).toLocaleTimeString()) : (t.startAtISO? ('Scheduled: '+ new Date(t.startAtISO).toLocaleString()) : 'Not started');
-        const expected = document.createElement('div'); expected.className='small-muted'; if(t.startedAt) expected.textContent = 'Ends: ' + new Date(t.startedAt + t.durationSec*1000).toLocaleTimeString();
-        right.append(started, expected);
-      }
-
-      card.append(left,right);
-      return card;
+    function startTask(id) {
+      const task = tasks.find(t=>t.id===id);
+      if (!task || task.status==="running") return;
+      task.status = "running";
+      timers[id] = setInterval(()=>{
+        task.elapsed++;
+        task.remaining--;
+        if (task.remaining<=0) {
+          clearInterval(timers[id]);
+          task.status = "failed";
+          task.alarming = true;
+          document.getElementById("alarmSound").play();
+        }
+        saveTasks();
+        renderTasks();
+      },1000);
+      saveTasks();
+      renderTasks();
     }
 
-    function updateStats(){ $('#total').textContent = tasks.length; $('#running').textContent = tasks.filter(x=>x.status==='running').length; $('#failed').textContent = tasks.filter(x=>x.status==='failed').length; }
+    function pauseTask(id) {
+      clearInterval(timers[id]);
+      tasks.find(t=>t.id===id).status="paused";
+      saveTasks();
+      renderTasks();
+    }
 
-    // global tick
-    setInterval(()=>{
-      let changed=false;
-      for(const t of tasks){
-        // start scheduled tasks if time reached
-        if(t.status==='scheduled' && t.startAtISO){ const s = new Date(t.startAtISO).getTime(); if(s<=now()){ startTask(t.id); changed=true; } }
-        // check expiry
-        if((t.status==='running' || t.status==='paused') && remaining(t)<=0 && !t.done){ t.status='failed'; t.alarming=true; changed=true; }
-      }
-      // alarm control
-      const anyAlarm = tasks.some(x=>x.alarming===true);
-      if(anyAlarm) startAlarm(); else stopAlarm();
-      if(changed) save();
-      render();
-    },1000);
+    function resetTask(id) {
+      clearInterval(timers[id]);
+      const task = tasks.find(t=>t.id===id);
+      task.status="idle";
+      task.elapsed=0;
+      task.remaining=task.limit*60;
+      task.alarming=false;
+      saveTasks();
+      renderTasks();
+    }
 
-    // wire UI
-    $('#addBtn').addEventListener('click', addTask);
-    $('#enableSound').addEventListener('click', enableAudio);
-    $('#stopAlarm').addEventListener('click', ()=>{ tasks.forEach(t=>t.alarming=false); stopAlarm(); save(); render(); });
-    $('#clearAll').addEventListener('click', ()=>{ if(confirm('Delete ALL tasks?')){ tasks=[]; save(); stopAlarm(); render(); }});
-    $('#exportBtn').addEventListener('click', ()=>{ const blob=new Blob([JSON.stringify(tasks, null, 2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='dayplanner-backup.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); });
-    $('#importBtn').addEventListener('click', ()=>{ const inp=document.createElement('input'); inp.type='file'; inp.accept='application/json'; inp.onchange=(e)=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const data = JSON.parse(r.result); if(Array.isArray(data)){ tasks = data; save(); render(); alert('Imported OK'); } else alert('Invalid file'); }catch(err){ alert('Invalid JSON'); } }; r.readAsText(f); }; inp.click(); });
+    function doneTask(id) {
+      clearInterval(timers[id]);
+      const task = tasks.find(t=>t.id===id);
+      task.status="done";
+      task.alarming=false;
+      saveTasks();
+      renderTasks();
+    }
 
-    // initial schedule for tasks having startAt in future
-    function initSchedule(){ for(const t of tasks){ if(t.startAtISO && t.status==='scheduled'){ const diff = new Date(t.startAtISO).getTime() - now(); if(diff>0){ setTimeout(()=> startTask(t.id), diff); } else { startTask(t.id); } } } }
+    function deleteTask(id) {
+      clearInterval(timers[id]);
+      tasks=tasks.filter(t=>t.id!==id);
+      saveTasks();
+      renderTasks();
+    }
 
-    // start
-    initSchedule(); render();
+    function stopAlarm(id) {
+      const alarm = document.getElementById("alarmSound");
+      alarm.pause();
+      alarm.currentTime=0;
+      const task = tasks.find(t=>t.id===id);
+      task.alarming=false;
+      saveTasks();
+      renderTasks();
+    }
+
+    renderTasks();
+    tasks.forEach(t=>{ if(t.startTime && t.status==="idle") scheduleAutoStart(t); });
   </script>
 </body>
 </html>
