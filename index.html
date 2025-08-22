@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Planner</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+    h1 { text-align: center; }
+    form { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    input, textarea, button { padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
+    button { background: #007bff; color: white; border: none; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    ul { list-style: none; padding: 0; }
+    li { background: white; padding: 12px; margin: 8px 0; border-radius: 8px; 
+         display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
+    .overdue { background: #ffe0e0; }
+    .completed { text-decoration: line-through; opacity: 0.7; }
+  </style>
+</head>
+<body>
+  <h1>Daily Planner</h1>
+  <form id="taskForm">
+    <input type="text" id="taskInput" placeholder="Task name" required>
+    <input type="number" id="timeInput" placeholder="Time (minutes)" min="1">
+    <input type="time" id="startInput">
+    <textarea id="noteInput" placeholder="Notes"></textarea>
+    <button type="submit">Add Task</button>
+  </form>
+
+  <ul id="taskList"></ul>
+
+  <button onclick="clearCompleted()">Clear Completed</button>
+  <button onclick="clearAll()">Clear All</button>
+
+  <script>
+    const form = document.getElementById("taskForm");
+    const taskList = document.getElementById("taskList");
+
+    let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+
+    function saveTasks() {
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function renderTasks() {
+      taskList.innerHTML = "";
+      tasks.forEach((task, index) => {
+        const li = document.createElement("li");
+        if (task.completed) li.classList.add("completed");
+        if (task.overdue) li.classList.add("overdue");
+
+        li.innerHTML = `
+          <div>
+            <strong>${task.name}</strong> (${task.minutes} min)
+            ${task.start ? "⏰ " + task.start : ""}
+            <br>
+            <small>${task.note || ""}</small>
+            <br>
+            <small>⏳ ${task.remaining > 0 ? task.remaining + "m left" : "Time's up!"}</small>
+          </div>
+          <div>
+            <button onclick="startTimer(${index})">▶</button>
+            <button onclick="pauseTimer(${index})">⏸</button>
+            <button onclick="completeTask(${index})">✔</button>
+            <button onclick="deleteTask(${index})">🗑</button>
+          </div>
+        `;
+        taskList.appendChild(li);
+      });
+    }
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const task = {
+        name: document.getElementById("taskInput").value,
+        minutes: parseInt(document.getElementById("timeInput").value) || 0,
+        remaining: parseInt(document.getElementById("timeInput").value) || 0,
+        start: document.getElementById("startInput").value,
+        note: document.getElementById("noteInput").value,
+        completed: false,
+        overdue: false,
+        timer: null
+      };
+      tasks.push(task);
+      saveTasks();
+      renderTasks();
+      form.reset();
+    });
+
+    function startTimer(i) {
+      let task = tasks[i];
+      if (task.remaining <= 0) return;
+      if (task.timer) clearInterval(task.timer);
+      task.timer = setInterval(() => {
+        task.remaining--;
+        if (task.remaining <= 0) {
+          clearInterval(task.timer);
+          task.overdue = true;
+          alert(`⏰ Time's up for: ${task.name}`);
+        }
+        saveTasks();
+        renderTasks();
+      }, 60000); // countdown every 1 min
+    }
+
+    function pauseTimer(i) {
+      let task = tasks[i];
+      if (task.timer) clearInterval(task.timer);
+      task.timer = null;
+      saveTasks();
+    }
+
+    function completeTask(i) {
+      tasks[i].completed = true;
+      if (tasks[i].timer) clearInterval(tasks[i].timer);
+      saveTasks();
+      renderTasks();
+    }
+
+    function deleteTask(i) {
+      if (tasks[i].timer) clearInterval(tasks[i].timer);
+      tasks.splice(i, 1);
+      saveTasks();
+      renderTasks();
+    }
+
+    function clearCompleted() {
+      tasks = tasks.filter(t => !t.completed);
+      saveTasks();
+      renderTasks();
+    }
+
+    function clearAll() {
+      if (confirm("Delete all tasks?")) {
+        tasks.forEach(t => { if (t.timer) clearInterval(t.timer); });
+        tasks = [];
+        saveTasks();
+        renderTasks();
+      }
+    }
+
+    renderTasks();
+  </script>
+</body>
+</html>
