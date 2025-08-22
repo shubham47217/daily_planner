@@ -7,37 +7,62 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f9;
+      background: linear-gradient(to right, #89f7fe, #66a6ff);
       margin: 0;
       padding: 20px;
+      color: #333;
     }
     h1 {
       text-align: center;
+      color: #222;
     }
     .task-list {
-      max-width: 600px;
+      max-width: 700px;
       margin: 20px auto;
-      background: #fff;
+      background: #ffffffcc;
       padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
     .task {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px;
+      padding: 12px;
       border-bottom: 1px solid #ddd;
+      border-radius: 8px;
+      margin: 5px 0;
+      background: #f9f9ff;
     }
     .task:last-child {
       border-bottom: none;
     }
     button {
       margin-left: 5px;
-      padding: 5px 10px;
-    }
-    .timer {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
       font-weight: bold;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    .add-btn {
+      background: #4CAF50;
+      color: white;
+    }
+    .pause-btn {
+      background: #ff9800;
+      color: white;
+    }
+    .remove-btn {
+      background: #f44336;
+      color: white;
+    }
+    .alarm-btn {
+      background: #2196F3;
+      color: white;
     }
     .urgent {
       color: red;
@@ -51,8 +76,8 @@
   <div class="task-list">
     <input id="taskName" type="text" placeholder="Task name" />
     <input id="taskMinutes" type="number" placeholder="Minutes" />
-    <button onclick="addTask()">Add Task</button>
-    <button onclick="enableAlarm()">Enable Loud Alarm</button>
+    <button class="add-btn" onclick="addTask()">Add Task</button>
+    <button class="alarm-btn" onclick="enableAlarm()">Enable Loud Alarm</button>
 
     <div id="tasks"></div>
   </div>
@@ -132,8 +157,8 @@
         div.innerHTML = `
           <span class="${timerClass}">${task.name} - ⏳ Remaining: ${remainingMinutes}m ${remainingSeconds}s | ⌛ Elapsed: ${elapsedMinutes}m ${elapsedSeconds}s</span>
           <span>
-            <button onclick="togglePause(${i})">${task.paused ? 'Resume' : 'Pause'}</button>
-            <button onclick="removeTask(${i})">Remove</button>
+            <button class="pause-btn" onclick="togglePause(${i})">${task.paused ? 'Resume' : 'Pause'}</button>
+            <button class="remove-btn" onclick="removeTask(${i})">Remove</button>
           </span>
         `;
         container.appendChild(div);
@@ -144,7 +169,7 @@
             const alarm = document.getElementById('alarmSound');
             alarm.play();
           }
-          alert(`Task "${task.name}" is over!`);
+          alert(`Task \"${task.name}\" is over!`);
         }
       });
       saveTasks();
