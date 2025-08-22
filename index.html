@@ -1,216 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Day Planner — Black Theme (Responsive)</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day Planner ⏰</title>
   <style>
-    :root{
-      --bg:#0b0f14;
-      --card:#0f1720;
-      --muted:#94a3b8;
-      --text:#e6eef8;
-      --accent:#10b981; /* green */
-      --accent-2:#06b6d4; /* cyan */
-      --danger:#ef4444;
-      --warn:#f59e0b;
-      --glass: rgba(255,255,255,0.03);
+    body {
+      font-family: Arial, sans-serif;
+      background: #0b0f1a;
+      color: white;
+      margin: 0;
+      padding: 20px;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0}
-    body{
-      background:linear-gradient(180deg,#020617 0%, #08101a 100%);
-      color:var(--text);
-      font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      padding:18px;
+    h1 {
+      text-align: center;
     }
-
-    header{max-width:1100px;margin:0 auto 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-    h1{font-size:20px;margin:0}
-    .controls{display:flex;gap:8px;flex-wrap:wrap}
-    .btn{border:0;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-    .btn:active{transform:translateY(1px)}
-
-    .btn-green{background:#0f766e;color:white;box-shadow:0 6px 18px rgba(16,185,129,0.08)}
-    .btn-red{background:#991b1b;color:white}
-    .btn-blue{background:#075985;color:white}
-    .btn-dark{background:var(--glass);color:var(--text);border:1px solid rgba(255,255,255,0.04)}
-
-    .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 360px;gap:18px}
-
-    /* new task card */
-    .new-task{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,0.03)}
-    .new-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-    .new-row input[type=text], .new-row input[type=number], .new-row input[type=datetime-local]{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)}
-    .small{width:120px}
-
-    /* task list */
-    .board{background:transparent}
-    .task-card{background:linear-gradient(180deg,#071219, #0b1722);border-radius:14px;padding:12px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.03);display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
-    .task-left{display:flex;flex-direction:column;gap:6px}
-    .task-title{font-weight:800;font-size:16px;display:flex;gap:8px;align-items:center}
-    .meta{font-size:12px;color:var(--muted)}
-    .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-    .pill{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.02);font-weight:700;font-size:13px;border:1px solid rgba(255,255,255,0.03)}
-    .pill.ok{background:linear-gradient(90deg,#052e16,#064e3b);color:#c7f9e4}
-    .pill.warn{background:linear-gradient(90deg,#2a1200,#5c2f00);color:#fff0cc}
-    .pill.dead{background:linear-gradient(90deg,#3b0b0b,#5b1b1b);color:#ffecec}
-    .actions{display:flex;gap:8px;align-items:center}
-
-    .icon-btn{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:10px;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-
-    /* right column: stats & instructions */
-    .side{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,0.03)}
-    .stat{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-    .muted{color:var(--muted);font-size:13px}
-
-    /* responsiveness */
-    @media (max-width:980px){
-      .container{grid-template-columns:1fr}
-      header{flex-direction:column;align-items:flex-start}
+    .task-input {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 15px;
+      background: #101828;
+      border-radius: 12px;
     }
-
+    input, button {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+    input { width: 100%; }
+    button {
+      cursor: pointer;
+    }
+    .add-btn {
+      background: #2ecc71;
+      color: white;
+      font-weight: bold;
+    }
+    .task {
+      background: #1c2235;
+      margin: 10px auto;
+      padding: 15px;
+      border-radius: 12px;
+      max-width: 500px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      margin: 5px 0;
+    }
+    .remaining { background: #d35400; }
+    .elapsed { background: #145a32; }
+    .paused { background: #7d6608; }
+    .failed { background: #922b21; }
+    .controls button {
+      margin: 5px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    .start { background: #27ae60; color: white; }
+    .reset { background: #f39c12; color: white; }
+    .done { background: #2ecc71; color: white; }
+    .edit { background: #2980b9; color: white; }
+    .delete { background: #e74c3c; color: white; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Day Planner ⏱️ — Black Theme</h1>
-    <div class="controls">
-      <button id="enableSound" class="btn btn-blue">🔊 Enable Alarm</button>
-      <button id="clearAll" class="btn btn-red">🧹 Clear All</button>
-      <button id="exportBtn" class="btn btn-dark">📤 Export</button>
-      <button id="importBtn" class="btn btn-dark">📥 Import</button>
-    </div>
-  </header>
 
-  <div class="container">
-    <div>
-      <div class="new-task">
-        <div class="new-row">
-          <input id="taskTitle" type="text" placeholder="Task title — e.g., Study Algorithms" />
-          <input id="durationMin" class="small" type="number" min="1" value="25" />
-          <button id="addTask" class="btn btn-green">➕ Add</button>
-        </div>
-        <div class="new-row">
-          <input id="startAt" type="datetime-local" style="flex:1;" />
-          <button id="scheduleBtn" class="btn btn-dark">⏰ Schedule</button>
-        </div>
-        <div class="muted">Tip: Click Enable Alarm once to allow loud sound. Tasks are saved to your browser.</div>
-      </div>
+  <h1>Day Planner ⏰ – Plan Tasks, Set Time Limits</h1>
 
-      <div id="board" class="board" style="margin-top:14px"></div>
-    </div>
-
-    <aside class="side">
-      <div class="stat"><div class="muted">Total tasks</div><div id="total">0</div></div>
-      <div class="stat"><div class="muted">Running</div><div id="running">0</div></div>
-      <div class="stat"><div class="muted">Completed</div><div id="done">0</div></div>
-      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0">
-      <div class="muted">Shortcuts</div>
-      <ul class="muted">
-        <li>Start / Pause tasks with buttons</li>
-        <li>Edit: opens quick dialogs</li>
-        <li>Export to back up your tasks (JSON)</li>
-      </ul>
-    </aside>
+  <div class="task-input">
+    <input id="title" placeholder="Task Title (optional)">
+    <input id="limit" type="number" placeholder="Time Limit (minutes)">
+    <input id="startTime" type="time" placeholder="Start Time (optional)">
+    <button class="add-btn" onclick="addTask()">+ Add Task</button>
   </div>
 
-  <!-- audio fallback source -->
-  <audio id="audioFallback" preload="auto">
+  <div id="tasks"></div>
+
+  <audio id="alarmSound">
     <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
   </audio>
 
-  <script>
-    // Utilities
-    const $ = (s) => document.querySelector(s);
-    const $$ = (s) => Array.from(document.querySelectorAll(s));
-    const STORE = 'dayplanner.v2';
+<script>
+let tasks = [];
+let alarm = document.getElementById("alarmSound");
 
-    function uid(){return Math.random().toString(36).slice(2,9)}
-    function now(){return Date.now()}
-    function fmtSec(s){ s = Math.max(0, Math.floor(s)); const h=Math.floor(s/3600); const m=Math.floor((s%3600)/60); const sec=s%60; return (h>0?String(h).padStart(2,'0')+':':'') + String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
+function addTask() {
+  const title = document.getElementById("title").value.trim() || "Untitled Task";
+  const limit = parseInt(document.getElementById("limit").value) || 1;
+  const startTime = document.getElementById("startTime").value;
 
-    // Tasks structure: {id,title,durationSec,createdAt,status,startedAt,pausedAccum,alarming,done,startAt}
-    let tasks = JSON.parse(localStorage.getItem(STORE) || '[]');
+  const task = {
+    id: Date.now(),
+    title,
+    limit: limit * 60, // convert to seconds
+    elapsed: 0,
+    running: false,
+    failed: false,
+    startTime: startTime || null,
+    timer: null
+  };
 
-    // Audio (WebAudio for loud, fallback to audio element)
-    let audioCtx=null, alarmOsc=null, alarmGain=null, alarmInterval=null;
-    let audioEnabled=false;
+  tasks.push(task);
+  renderTasks();
+}
 
-    function enableAudio(){
-      if(audioEnabled) return;
-      try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); audioEnabled = true; $('#enableSound').textContent='🔊 Alarm Ready'; }
-      catch(e){ console.warn('WebAudio not supported',e); }
-      // prime fallback element
-      $('#audioFallback').play().then(()=>{ $('#audioFallback').pause(); $('#audioFallback').currentTime=0; }).catch(()=>{});
+function renderTasks() {
+  const container = document.getElementById("tasks");
+  container.innerHTML = "";
+
+  tasks.forEach(task => {
+    const div = document.createElement("div");
+    div.className = "task";
+    div.innerHTML = `
+      <h3>${task.title}</h3>
+      <div class="badge remaining">Remaining: ${formatTime(task.limit - task.elapsed)}</div>
+      <div class="badge elapsed">Elapsed: ${formatTime(task.elapsed)}</div>
+      <div class="badge ${task.failed ? 'failed' : task.running ? 'paused' : ''}">
+        ${task.failed ? 'FAILED' : task.running ? 'RUNNING' : 'PAUSED'}
+      </div>
+      <div class="controls">
+        <button class="start" onclick="startTask(${task.id})">Start</button>
+        <button class="reset" onclick="resetTask(${task.id})">Reset</button>
+        <button class="done" onclick="doneTask(${task.id})">Done</button>
+        <button class="delete" onclick="deleteTask(${task.id})">Delete</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function startTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task || task.failed) return;
+
+  if (task.timer) clearInterval(task.timer);
+
+  task.running = true;
+  task.timer = setInterval(() => {
+    task.elapsed++;
+    if (task.elapsed >= task.limit) {
+      clearInterval(task.timer);
+      task.failed = true;
+      task.running = false;
+      alarm.play().catch(()=>{}); // auto play
     }
+    renderTasks();
+  }, 1000);
+  renderTasks();
+}
 
-    function startAlarm(){
-      // use WebAudio if possible for louder sound
-      if(audioCtx){
-        if(alarmOsc) return; // already running
-        alarmOsc = audioCtx.createOscillator(); alarmGain = audioCtx.createGain();
-        alarmOsc.type='square'; alarmOsc.frequency.value=800; alarmGain.gain.value=0.18;
-        alarmOsc.connect(alarmGain).connect(audioCtx.destination);
-        alarmOsc.start();
-        // siren modulation
-        alarmInterval = setInterval(()=>{
-          if(!alarmOsc) return; const t = audioCtx.currentTime; alarmOsc.frequency.setValueAtTime(600,t); alarmOsc.frequency.linearRampToValueAtTime(1200,t+0.5); alarmOsc.frequency.linearRampToValueAtTime(600,t+1);
-        },1000);
-      } else {
-        // fallback
-        const a = $('#audioFallback'); try{ a.play().catch(()=>{}); }catch(e){}
-      }
-    }
-    function stopAlarm(){ if(alarmOsc){ try{ alarmOsc.stop(); }catch(e){} alarmOsc.disconnect(); alarmOsc=null; } if(alarmGain){ alarmGain.disconnect(); alarmGain=null; } if(alarmInterval){ clearInterval(alarmInterval); alarmInterval=null; } try{ $('#audioFallback').pause(); $('#audioFallback').currentTime=0; }catch(e){} }
+function resetTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  clearInterval(task.timer);
+  task.elapsed = 0;
+  task.failed = false;
+  task.running = false;
+  alarm.pause();
+  alarm.currentTime = 0;
+  renderTasks();
+}
 
-    // Task helpers
-    function save(){ localStorage.setItem(STORE, JSON.stringify(tasks)); }
-    function elapsed(t){ if(t.status==='running') return Math.floor((now()-t.startedAt)/1000) + (t.pausedAccum||0); return t.pausedAccum||0; }
-    function remaining(t){ return Math.max(0, t.durationSec - elapsed(t)); }
+function doneTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  clearInterval(task.timer);
+  task.running = false;
+  task.failed = false;
+  alarm.pause();
+  alarm.currentTime = 0;
+  renderTasks();
+}
 
-    function createTask({title,durationMin,startAtISO}){
-      const t = { id: uid(), title: title||'Untitled task', durationSec: Math.max(60, Math.floor(Number(durationMin)||25)*60), createdAt: now(), status:'idle', startedAt:null, pausedAccum:0, alarming:false, done:false, startAt: startAtISO||null };
-      tasks.push(t); save(); render();
-      if(startAtISO){ const diff = new Date(startAtISO).getTime()-now(); if(diff<=0) startTask(t.id); else setTimeout(()=> startTask(t.id), diff); }
-    }
+function deleteTask(id) {
+  const index = tasks.findIndex(t => t.id === id);
+  if (index !== -1) {
+    clearInterval(tasks[index].timer);
+    tasks.splice(index, 1);
+    alarm.pause();
+    alarm.currentTime = 0;
+    renderTasks();
+  }
+}
 
-    function startTask(id){ const t = tasks.find(x=>x.id===id); if(!t || t.done) return; if(t.status!=='running'){ t.status='running'; t.startedAt = now(); save(); render(); } }
-    function pauseTask(id){ const t=tasks.find(x=>x.id===id); if(!t) return; if(t.status==='running'){ t.pausedAccum = elapsed(t); t.status='paused'; t.startedAt=null; save(); render(); } }
-    function resetTask(id){ const t=tasks.find(x=>x.id===id); if(!t) return; t.status='idle'; t.startedAt=null; t.pausedAccum=0; t.alarming=false; t.done=false; save(); stopAlarm(); render(); }
-    function completeTask(id){ const t=tasks.find(x=>x.id===id); if(!t) return; t.done=true; t.status='done'; t.alarming=false; save(); stopAlarm(); render(); }
-    function deleteTask(id){ tasks = tasks.filter(x=>x.id!==id); save(); render(); }
-    function editTask(id){ const t=tasks.find(x=>x.id===id); if(!t) return; const newTitle = prompt('Edit title', t.title); if(newTitle===null) return; let newMin = prompt('Time limit (minutes)', Math.ceil(t.durationSec/60)); if(newMin===null) return; newMin = Math.max(1, Number(newMin)||25); const wasElapsed = elapsed(t); t.title = newTitle; t.durationSec = newMin*60; t.pausedAccum = Math.min(wasElapsed, t.durationSec); if(t.status==='running') t.startedAt = now(); save(); render(); }
+function formatTime(sec) {
+  let m = Math.floor(sec / 60);
+  let s = sec % 60;
+  return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+}
 
-    // Render
-    function render(){ const board = $('#board'); board.innerHTML=''; if(tasks.length===0){ board.innerHTML = `<div class="task-card" style="justify-content:center"><div class="meta">No tasks yet — add one to begin</div></div>`; updateStats(); return; }
-      for(const t of tasks){
-        // check expiry
-        if(t.status==='running' && remaining(t)<=0 && !t.done){ t.status='expired'; t.alarming=true; }
+</script>
 
-        const card = document.createElement('div'); card.className='task-card'; if(t.status==='expired') card.classList.add('expired'); else if(t.status==='idle' || t.status==='paused') card.classList.add('idle');
-        const left = document.createElement('div'); left.className='task-left';
-        const title = document.createElement('div'); title.className='task-title'; title.innerHTML = `${t.title}`;
-        const meta = document.createElement('div'); meta.className='meta'; meta.textContent = new Date(t.createdAt).toLocaleString();
-        const pills = document.createElement('div'); pills.className='pills';
-        const rem = remaining(t); const el = elapsed(t);
-        const pRem = document.createElement('span'); pRem.className = 'pill ' + (rem===0 && t.status==='expired' ? 'dead' : rem<=60 ? 'warn' : 'ok'); pRem.textContent = '⏳ ' + fmtSec(rem);
-        const pEl = document.createElement('span'); pEl.className='pill ok'; pEl.textContent = '⌛ ' + fmtSec(el);
-        const pLim = document.createElement('span'); pLim.className='pill'; pLim.textContent = '🎯 ' + fmtSec(t.durationSec);
-        const pStatus = document.createElement('span'); pStatus.className='pill'; pStatus.textContent = '📌 ' + (t.status||'idle').toUpperCase();
-        pills.append(pRem,pEl,pLim,pStatus);
-        left.append(title,meta,pills);
-
-        const right = document.createElement('div'); right.style.display='flex'; right.style.flexDirection='column'; right.style.alignItems='flex-end'; right.style.gap='8px';
-        const row = document.createElement('div'); row.className='actions';
-
-        // action buttons with icons
-        const make = (text, cls, fn) => { const b = document.createElement('button'); b.className='icon-btn'; b.innerHTML = text; b.onclick = fn; row.appendChild(b); };
-        if(t.status!=='running' && !t.done) make('▶️<span style="margin-left:6px">Start</span>','',()=>startTask(t.id));
-        if(t.status==='running') make('⏸️<span style="margin-left:6px">Pause</span>','',()=>pauseTask(t.id));
-        make('🔁<span style="margin-left:6px">Reset</span>','',()=>resetTask(t.id));
-        make('✅<span style="margin-left:6px">Done</span>','',()=>completeTask(t.id));
-        make('✏️<span style="margin-left:6px">Edit</span>','',()=>editTask(t.id));
-        make('🗑️<span style="margin-left:6px">Delete</span>','',()
+</body>
+</html>
