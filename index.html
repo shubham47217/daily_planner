@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #89f7fe, #66a6ff);
+      background: linear-gradient(to right, #ffecd2, #fcb69f);
       margin: 0;
       padding: 20px;
       color: #333;
@@ -29,13 +29,19 @@
       justify-content: space-between;
       align-items: center;
       padding: 12px;
-      border-bottom: 1px solid #ddd;
       border-radius: 8px;
-      margin: 5px 0;
-      background: #f9f9ff;
+      margin: 8px 0;
+      background: #fdfdfd;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    .task:last-child {
-      border-bottom: none;
+    .task.expired {
+      background: #ffe5e5;
+      color: #b00020;
+      font-weight: bold;
+    }
+    .task.idle {
+      background: #e6f7ff;
+      color: #006699;
     }
     button {
       margin-left: 5px;
@@ -63,10 +69,6 @@
     .alarm-btn {
       background: #2196F3;
       color: white;
-    }
-    .urgent {
-      color: red;
-      font-weight: bold;
     }
   </style>
 </head>
@@ -111,7 +113,7 @@
       if (!name || isNaN(minutes)) return;
       const startTime = Date.now();
       const endTime = startTime + minutes * 60 * 1000;
-      tasks.push({ name, startTime, endTime, paused: false, elapsed: 0 });
+      tasks.push({ name, startTime, endTime, paused: false, elapsed: 0, done: false });
       saveTasks();
       renderTasks();
       document.getElementById('taskName').value = '';
@@ -152,10 +154,14 @@
         const elapsedMinutes = Math.floor(elapsed / 60000);
         const elapsedSeconds = Math.floor((elapsed % 60000) / 1000);
 
-        let timerClass = (remainingMinutes < 1 && remaining > 0) ? 'urgent' : '';
+        if (remaining <= 0) {
+          div.classList.add('expired');
+        } else if (task.paused) {
+          div.classList.add('idle');
+        }
 
         div.innerHTML = `
-          <span class="${timerClass}">${task.name} - ⏳ Remaining: ${remainingMinutes}m ${remainingSeconds}s | ⌛ Elapsed: ${elapsedMinutes}m ${elapsedSeconds}s</span>
+          <span>${task.name} - ⏳ Remaining: ${remainingMinutes}m ${remainingSeconds}s | ⌛ Elapsed: ${elapsedMinutes}m ${elapsedSeconds}s</span>
           <span>
             <button class="pause-btn" onclick="togglePause(${i})">${task.paused ? 'Resume' : 'Pause'}</button>
             <button class="remove-btn" onclick="removeTask(${i})">Remove</button>
