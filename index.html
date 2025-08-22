@@ -3,172 +3,240 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Day Planner</title>
+  <title>Day Planner with Timer</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: black;
+      background-color: #111827;
       color: white;
-      text-align: center;
-      padding: 20px;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
     }
     h1 {
-      color: #00ffcc;
+      margin: 20px 0;
+      font-size: 2rem;
+      color: #38bdf8;
+    }
+    .task-container {
+      width: 95%;
+      max-width: 800px;
+    }
+    .day-group {
+      margin-bottom: 30px;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 15px;
+      background: #1f2937;
+    }
+    .day-title {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      color: #fbbf24;
     }
     .task {
-      background-color: #1a1a1a;
+      background: #111;
+      margin: 10px 0;
       padding: 15px;
-      margin: 15px auto;
       border-radius: 12px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 0 10px #00ffcc;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
     }
-    input, button {
+    .task h3 { margin: 0; }
+    .info { font-size: 0.9rem; color: #bbb; margin: 4px 0; }
+    .status { font-weight: bold; margin-top: 8px; }
+    .controls button {
       margin: 5px;
-      padding: 8px;
-      border-radius: 8px;
+      padding: 8px 14px;
       border: none;
-    }
-    button {
+      border-radius: 8px;
+      font-size: 0.9rem;
       cursor: pointer;
-      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
     }
-    .start-btn { background-color: #4CAF50; color: white; }
-    .pause-btn { background-color: orange; color: white; }
-    .reset-btn { background-color: #f44336; color: white; }
-    .delete-btn { background-color: #ff0066; color: white; }
-    .edit-btn { background-color: #008CBA; color: white; }
+    .start { background: #22c55e; color: black; }
+    .reset, .edit { background: #374151; color: white; }
+    .done { background: #4ade80; color: black; }
+    .delete { background: #ef4444; color: white; }
+    .stop-alarm { background: #facc15; color: black; }
   </style>
 </head>
 <body>
+  <h1>Day Planner</h1>
 
-  <h1>🕒 Day Planner</h1>
+  <div style="margin-bottom:20px;">
+    <input id="taskName" placeholder="Task name"> 
+    <input id="duration" type="number" placeholder="Minutes" style="width:90px;"> 
+    <button onclick="addTask()">Add Task</button>
+    <button onclick="clearAllTasks()">Clear All</button>
+    <button onclick="enableAlarm()">Enable Alarm</button>
+  </div>
 
-  <input type="text" id="taskName" placeholder="Task name">
-  <input type="number" id="taskTime" placeholder="Minutes">
-  <button onclick="addTask()">Add Task</button>
+  <div id="taskContainer" class="task-container"></div>
 
-  <div id="taskList"></div>
-
-  <audio id="alarmSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+  <audio id="alarmSound">
+    <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
+  </audio>
 
   <script>
-    let tasks = [];
+    let tasks = JSON.parse(localStorage.getItem('tasks')||'[]');
+    let alarmEnabled = false;
+    const alarmSound = document.getElementById("alarmSound");
 
-    function addTask() {
-      const name = document.getElementById("taskName").value;
-      const minutes = parseInt(document.getElementById("taskTime").value);
+    function enableAlarm(){
+      alarmEnabled = true;
+      alarmSound.play().then(()=>{alarmSound.pause();alarmSound.currentTime=0;});
+      alert("Alarm enabled! It will play when time is over.");
+    }
 
-      if (!name || isNaN(minutes) || minutes <= 0) {
-        alert("Enter valid task and time!");
-        return;
-      }
-
-      const task = {
-        id: Date.now(),
-        name,
-        duration: minutes * 60,
-        remaining: minutes * 60,
-        elapsed: 0,
-        running: false,
-        interval: null
-      };
-
+    function addTask(){
+      const name=document.getElementById("taskName").value||"Untitled";
+      const duration=parseInt(document.getElementById("duration").value)||1;
+      const id=Date.now();
+      const task={id,name,duration,status:"idle",elapsed:0};
       tasks.push(task);
+      saveTasks();
       renderTasks();
-      document.getElementById("taskName").value = "";
-      document.getElementById("taskTime").value = "";
     }
 
-    function renderTasks() {
-      const taskList = document.getElementById("taskList");
-      taskList.innerHTML = "";
+    function clearAllTasks(){
+      if(confirm("Clear all tasks?")){
+        tasks=[];
+        saveTasks();
+        renderTasks();
+      }
+    }
 
-      tasks.forEach(task => {
-        const div = document.createElement("div");
-        div.className = "task";
+    function saveTasks(){
+      localStorage.setItem('tasks',JSON.stringify(tasks));
+    }
 
-        const remainingMins = Math.floor(task.remaining / 60);
-        const remainingSecs = task.remaining % 60;
-        const elapsedMins = Math.floor(task.elapsed / 60);
-        const elapsedSecs = task.elapsed % 60;
+    function startTask(id){
+      const task=tasks.find(t=>t.id===id);
+      if(task){
+        task.status="running";
+        task.start=Date.now();
+        task.end=task.start+task.duration*60000;
+        saveTasks();
+        renderTasks();
+      }
+    }
 
-        div.innerHTML = `
-          <h3>${task.name}</h3>
-          <p>⏳ Remaining: ${remainingMins}:${remainingSecs.toString().padStart(2,'0')}</p>
-          <p>⏱️ Elapsed: ${elapsedMins}:${elapsedSecs.toString().padStart(2,'0')}</p>
-          <p>⌛ Limit: ${Math.floor(task.duration / 60)} min</p>
-          <button class="start-btn" onclick="startTask(${task.id})">Start</button>
-          <button class="pause-btn" onclick="pauseTask(${task.id})">Pause</button>
-          <button class="reset-btn" onclick="resetTask(${task.id})">Reset</button>
-          <button class="edit-btn" onclick="editTask(${task.id})">Edit</button>
-          <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
-        `;
+    function resetTask(id){
+      const task=tasks.find(t=>t.id===id);
+      if(task){
+        task.status="idle";
+        task.elapsed=0;
+        delete task.start;
+        delete task.end;
+        saveTasks();
+        renderTasks();
+      }
+      stopAlarm();
+    }
 
-        taskList.appendChild(div);
+    function stopAlarm(){
+      alarmSound.pause();
+      alarmSound.currentTime=0;
+    }
+
+    function deleteTask(id){
+      tasks=tasks.filter(t=>t.id!==id);
+      saveTasks();
+      renderTasks();
+    }
+
+    function doneTask(id){
+      const task=tasks.find(t=>t.id===id);
+      if(task){
+        task.status="done";
+        saveTasks();
+        renderTasks();
+      }
+      stopAlarm();
+    }
+
+    function editTask(id){
+      const task=tasks.find(t=>t.id===id);
+      if(!task) return;
+      const newName=prompt("Task name",task.name);
+      const newDur=parseInt(prompt("Duration (minutes)",task.duration));
+      if(newName) task.name=newName;
+      if(newDur) task.duration=newDur;
+      saveTasks();
+      renderTasks();
+    }
+
+    function renderTasks(){
+      const container=document.getElementById("taskContainer");
+      container.innerHTML="";
+      const grouped={};
+      tasks.forEach(t=>{
+        const day=new Date(t.id).toLocaleDateString();
+        if(!grouped[day]) grouped[day]=[];
+        grouped[day].push(t);
       });
-    }
+      for(const day in grouped){
+        const group=document.createElement("div");
+        group.className="day-group";
+        const title=document.createElement("div");
+        title.className="day-title";
+        title.textContent=day;
+        group.appendChild(title);
+        grouped[day].forEach(task=>{
+          const div=document.createElement("div");
+          div.className="task";
+          const now=Date.now();
+          let remain,elapsed;
+          if(task.status==="running"){
+            remain=Math.max(0,Math.floor((task.end-now)/1000));
+            elapsed=Math.floor((now-task.start)/1000);
+            if(remain<=0){
+              task.status="failed";
+              if(alarmEnabled){alarmSound.play();}
+            }
+          }else if(task.status==="done"){
+            remain=0;elapsed=task.duration*60;
+          }else{
+            remain=task.duration*60-task.elapsed;
+            elapsed=task.elapsed;
+          }
+          div.innerHTML=`<h3>${task.name}</h3>
+            <div class="info">Limit: ${task.duration}m</div>
+            ${task.start?`<div class="info">Started: ${new Date(task.start).toLocaleTimeString()}</div>`:"<div class=\"info\">Not started yet</div>"}
+            ${task.end?`<div class="info">Ends: ${new Date(task.end).toLocaleTimeString()}</div>`:""}
+            <div class="info">Remaining: ${String(Math.floor(remain/60)).padStart(2,'0')}:${String(remain%60).padStart(2,'0')}</div>
+            <div class="info">Elapsed: ${String(Math.floor(elapsed/60)).padStart(2,'0')}:${String(elapsed%60).padStart(2,'0')}</div>
+            <div class="status">${task.status.toUpperCase()}</div>`;
 
-    function startTask(id) {
-      const task = tasks.find(t => t.id === id);
-      if (!task || task.running) return;
-
-      task.running = true;
-      task.interval = setInterval(() => {
-        if (task.remaining > 0) {
-          task.remaining--;
-          task.elapsed++;
-        } else {
-          clearInterval(task.interval);
-          task.running = false;
-          document.getElementById("alarmSound").play();
-          alert(`⏰ Task "${task.name}" is over!`);
-        }
-        renderTasks();
-      }, 1000);
-    }
-
-    function pauseTask(id) {
-      const task = tasks.find(t => t.id === id);
-      if (task && task.running) {
-        clearInterval(task.interval);
-        task.running = false;
-        renderTasks();
+          const controls=document.createElement("div");
+          controls.className="controls";
+          if(task.status==="idle"){
+            const s=document.createElement("button");s.className="start";s.innerHTML="▶ Start";s.onclick=()=>startTask(task.id);controls.appendChild(s);
+          }
+          if(task.status==="running"){
+            const r=document.createElement("button");r.className="reset";r.innerHTML="↺ Reset";r.onclick=()=>resetTask(task.id);controls.appendChild(r);
+          }
+          if(task.status==="failed"){
+            const stop=document.createElement("button");stop.className="stop-alarm";stop.innerHTML="⏹ Stop Alarm";stop.onclick=()=>stopAlarm();controls.appendChild(stop);
+          }
+          const d=document.createElement("button");d.className="done";d.innerHTML="✔ Done";d.onclick=()=>doneTask(task.id);controls.appendChild(d);
+          const e=document.createElement("button");e.className="edit";e.innerHTML="✎ Edit";e.onclick=()=>editTask(task.id);controls.appendChild(e);
+          const del=document.createElement("button");del.className="delete";del.innerHTML="🗑 Delete";del.onclick=()=>deleteTask(task.id);controls.appendChild(del);
+          div.appendChild(controls);
+          group.appendChild(div);
+        });
+        container.appendChild(group);
       }
+      saveTasks();
     }
 
-    function resetTask(id) {
-      const task = tasks.find(t => t.id === id);
-      if (task) {
-        clearInterval(task.interval);
-        task.remaining = task.duration;
-        task.elapsed = 0;
-        task.running = false;
-        renderTasks();
-      }
-    }
-
-    function editTask(id) {
-      const task = tasks.find(t => t.id === id);
-      if (task) {
-        const newName = prompt("Edit task name:", task.name);
-        const newMinutes = parseInt(prompt("Edit duration (minutes):", task.duration / 60));
-        if (newName && !isNaN(newMinutes) && newMinutes > 0) {
-          task.name = newName;
-          task.duration = newMinutes * 60;
-          task.remaining = newMinutes * 60;
-          task.elapsed = 0;
-        }
-        renderTasks();
-      }
-    }
-
-    function deleteTask(id) {
-      tasks = tasks.filter(t => t.id !== id);
-      renderTasks();
-    }
+    setInterval(renderTasks,1000);
+    renderTasks();
   </script>
-
 </body>
 </html>
