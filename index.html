@@ -7,255 +7,168 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #000;
-      color: #fff;
-      margin: 0;
-      padding: 0;
-    }
-    header {
+      background-color: black;
+      color: white;
       text-align: center;
-      padding: 1rem;
-      background: #111;
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
-    .container {
-      max-width: 800px;
-      margin: 20px auto;
       padding: 20px;
     }
-    .task-input {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .task-input input {
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      flex: 1;
-    }
-    .task-input button {
-      background: #28a745;
-      color: #fff;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .day-group {
-      margin-top: 20px;
-    }
-    .day-group h2 {
-      border-bottom: 2px solid #555;
-      padding-bottom: 5px;
+    h1 {
+      color: #00ffcc;
     }
     .task {
-      background: #1e1e1e;
+      background-color: #1a1a1a;
       padding: 15px;
-      margin: 10px 0;
-      border-radius: 10px;
-      box-shadow: 0 0 5px #444;
+      margin: 15px auto;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 10px #00ffcc;
     }
-    .task.running { border-left: 5px solid #28a745; }
-    .task.expired, .task.failed { border-left: 5px solid #dc3545; }
-    .task.done { border-left: 5px solid #007bff; }
-    .task-header {
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
-    .task-details {
-      margin-top: 8px;
-      font-size: 0.9rem;
-      color: #ddd;
-    }
-    .buttons {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .buttons button {
-      flex: 1;
+    input, button {
+      margin: 5px;
       padding: 8px;
-      border: none;
       border-radius: 8px;
+      border: none;
+    }
+    button {
       cursor: pointer;
       font-weight: bold;
     }
-    .start { background: #28a745; color: #fff; }
-    .pause { background: #ffc107; color: #000; }
-    .reset { background: #17a2b8; color: #fff; }
-    .done { background: #007bff; color: #fff; }
-    .delete { background: #dc3545; color: #fff; }
-    .stopalarm { background: #ff5722; color: #fff; }
+    .start-btn { background-color: #4CAF50; color: white; }
+    .pause-btn { background-color: orange; color: white; }
+    .reset-btn { background-color: #f44336; color: white; }
+    .delete-btn { background-color: #ff0066; color: white; }
+    .edit-btn { background-color: #008CBA; color: white; }
   </style>
 </head>
 <body>
-  <header>📅 Day Planner</header>
-  <div class="container">
-    <div class="task-input">
-      <input type="text" id="title" placeholder="Task title (optional)">
-      <input type="number" id="limit" placeholder="Time limit (minutes)" min="1">
-      <input type="time" id="startTime">
-      <button onclick="addTask()">➕ Add</button>
-    </div>
-    <div id="tasks"></div>
-  </div>
 
-  <audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
+  <h1>🕒 Day Planner</h1>
+
+  <input type="text" id="taskName" placeholder="Task name">
+  <input type="number" id="taskTime" placeholder="Minutes">
+  <button onclick="addTask()">Add Task</button>
+
+  <div id="taskList"></div>
+
+  <audio id="alarmSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
 
   <script>
-    let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-    let timers = {};
+    let tasks = [];
 
-    function saveTasks() {
-      localStorage.setItem("tasks", JSON.stringify(tasks));
+    function addTask() {
+      const name = document.getElementById("taskName").value;
+      const minutes = parseInt(document.getElementById("taskTime").value);
+
+      if (!name || isNaN(minutes) || minutes <= 0) {
+        alert("Enter valid task and time!");
+        return;
+      }
+
+      const task = {
+        id: Date.now(),
+        name,
+        duration: minutes * 60,
+        remaining: minutes * 60,
+        elapsed: 0,
+        running: false,
+        interval: null
+      };
+
+      tasks.push(task);
+      renderTasks();
+      document.getElementById("taskName").value = "";
+      document.getElementById("taskTime").value = "";
     }
 
     function renderTasks() {
-      const container = document.getElementById("tasks");
-      container.innerHTML = "";
-      const grouped = {};
+      const taskList = document.getElementById("taskList");
+      taskList.innerHTML = "";
 
       tasks.forEach(task => {
-        if (!grouped[task.date]) grouped[task.date] = [];
-        grouped[task.date].push(task);
+        const div = document.createElement("div");
+        div.className = "task";
+
+        const remainingMins = Math.floor(task.remaining / 60);
+        const remainingSecs = task.remaining % 60;
+        const elapsedMins = Math.floor(task.elapsed / 60);
+        const elapsedSecs = task.elapsed % 60;
+
+        div.innerHTML = `
+          <h3>${task.name}</h3>
+          <p>⏳ Remaining: ${remainingMins}:${remainingSecs.toString().padStart(2,'0')}</p>
+          <p>⏱️ Elapsed: ${elapsedMins}:${elapsedSecs.toString().padStart(2,'0')}</p>
+          <p>⌛ Limit: ${Math.floor(task.duration / 60)} min</p>
+          <button class="start-btn" onclick="startTask(${task.id})">Start</button>
+          <button class="pause-btn" onclick="pauseTask(${task.id})">Pause</button>
+          <button class="reset-btn" onclick="resetTask(${task.id})">Reset</button>
+          <button class="edit-btn" onclick="editTask(${task.id})">Edit</button>
+          <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
+        `;
+
+        taskList.appendChild(div);
       });
-
-      Object.keys(grouped).forEach(date => {
-        const groupDiv = document.createElement("div");
-        groupDiv.className = "day-group";
-        groupDiv.innerHTML = `<h2>${date}</h2>`;
-        grouped[date].forEach(task => {
-          const taskDiv = document.createElement("div");
-          taskDiv.className = `task ${task.status}`;
-          taskDiv.innerHTML = `
-            <div class="task-header">${task.title || "Untitled Task"}</div>
-            <div class="task-details">
-              ⏳ Limit: ${task.limit} min<br>
-              ⏱️ Elapsed: ${Math.floor(task.elapsed/60)}m ${task.elapsed%60}s<br>
-              ⏲️ Remaining: ${task.remaining > 0 ? Math.floor(task.remaining/60)+"m "+task.remaining%60+"s" : "0m 0s"}<br>
-              📌 Status: ${task.status.toUpperCase()}
-            </div>
-            <div class="buttons">
-              ${task.status==="idle"?`<button class="start" onclick="startTask('${task.id}')">Start</button>`:""}
-              ${task.status==="running"?`<button class="pause" onclick="pauseTask('${task.id}')">Pause</button>`:""}
-              ${task.status==="running"||task.status==="paused"?`<button class="reset" onclick="resetTask('${task.id}')">Reset</button>`:""}
-              ${task.status!=="done"?`<button class="done" onclick="doneTask('${task.id}')">Done</button>`:""}
-              <button class="delete" onclick="deleteTask('${task.id}')">Delete</button>
-              ${task.alarming?`<button class="stopalarm" onclick="stopAlarm('${task.id}')">Stop Alarm</button>`:""}
-            </div>
-          `;
-          groupDiv.appendChild(taskDiv);
-        });
-        container.appendChild(groupDiv);
-      });
-    }
-
-    function addTask() {
-      const title = document.getElementById("title").value.trim();
-      const limit = parseInt(document.getElementById("limit").value);
-      const startTime = document.getElementById("startTime").value;
-      if (!limit) return alert("Set a time limit!");
-      const id = Date.now().toString();
-      const today = new Date().toISOString().split("T")[0];
-      const task = {
-        id, title, limit,
-        elapsed: 0,
-        remaining: limit*60,
-        status: "idle",
-        alarming: false,
-        date: today,
-        startTime: startTime || null
-      };
-      tasks.push(task);
-      saveTasks();
-      renderTasks();
-      if (startTime) scheduleAutoStart(task);
-    }
-
-    function scheduleAutoStart(task) {
-      const now = new Date();
-      const [h, m] = task.startTime.split(":").map(Number);
-      const start = new Date();
-      start.setHours(h, m, 0, 0);
-      const delay = start - now;
-      if (delay > 0) {
-        setTimeout(() => startTask(task.id), delay);
-      } else {
-        startTask(task.id);
-      }
     }
 
     function startTask(id) {
-      const task = tasks.find(t=>t.id===id);
-      if (!task || task.status==="running") return;
-      task.status = "running";
-      timers[id] = setInterval(()=>{
-        task.elapsed++;
-        task.remaining--;
-        if (task.remaining<=0) {
-          clearInterval(timers[id]);
-          task.status = "failed";
-          task.alarming = true;
+      const task = tasks.find(t => t.id === id);
+      if (!task || task.running) return;
+
+      task.running = true;
+      task.interval = setInterval(() => {
+        if (task.remaining > 0) {
+          task.remaining--;
+          task.elapsed++;
+        } else {
+          clearInterval(task.interval);
+          task.running = false;
           document.getElementById("alarmSound").play();
+          alert(`⏰ Task "${task.name}" is over!`);
         }
-        saveTasks();
         renderTasks();
-      },1000);
-      saveTasks();
-      renderTasks();
+      }, 1000);
     }
 
     function pauseTask(id) {
-      clearInterval(timers[id]);
-      tasks.find(t=>t.id===id).status="paused";
-      saveTasks();
-      renderTasks();
+      const task = tasks.find(t => t.id === id);
+      if (task && task.running) {
+        clearInterval(task.interval);
+        task.running = false;
+        renderTasks();
+      }
     }
 
     function resetTask(id) {
-      clearInterval(timers[id]);
-      const task = tasks.find(t=>t.id===id);
-      task.status="idle";
-      task.elapsed=0;
-      task.remaining=task.limit*60;
-      task.alarming=false;
-      saveTasks();
-      renderTasks();
+      const task = tasks.find(t => t.id === id);
+      if (task) {
+        clearInterval(task.interval);
+        task.remaining = task.duration;
+        task.elapsed = 0;
+        task.running = false;
+        renderTasks();
+      }
     }
 
-    function doneTask(id) {
-      clearInterval(timers[id]);
-      const task = tasks.find(t=>t.id===id);
-      task.status="done";
-      task.alarming=false;
-      saveTasks();
-      renderTasks();
+    function editTask(id) {
+      const task = tasks.find(t => t.id === id);
+      if (task) {
+        const newName = prompt("Edit task name:", task.name);
+        const newMinutes = parseInt(prompt("Edit duration (minutes):", task.duration / 60));
+        if (newName && !isNaN(newMinutes) && newMinutes > 0) {
+          task.name = newName;
+          task.duration = newMinutes * 60;
+          task.remaining = newMinutes * 60;
+          task.elapsed = 0;
+        }
+        renderTasks();
+      }
     }
 
     function deleteTask(id) {
-      clearInterval(timers[id]);
-      tasks=tasks.filter(t=>t.id!==id);
-      saveTasks();
+      tasks = tasks.filter(t => t.id !== id);
       renderTasks();
     }
-
-    function stopAlarm(id) {
-      const alarm = document.getElementById("alarmSound");
-      alarm.pause();
-      alarm.currentTime=0;
-      const task = tasks.find(t=>t.id===id);
-      task.alarming=false;
-      saveTasks();
-      renderTasks();
-    }
-
-    renderTasks();
-    tasks.forEach(t=>{ if(t.startTime && t.status==="idle") scheduleAutoStart(t); });
   </script>
+
 </body>
 </html>
