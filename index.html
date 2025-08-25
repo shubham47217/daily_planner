@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Day Planner 🕒 — Plan Tasks, Grouped by Day</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg:#0b1120; --panel:#0f172a; --card:#0b1220; --muted:#9aa4b2; --text:#e6edf6;
@@ -11,49 +12,51 @@
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0;background:radial-gradient(1200px 800px at 10% -10%, #0d1b2a 0%, #0b1120 40%, #070d1a 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial;}
+    body{margin:0;background:radial-gradient(1200px 800px at 10% -10%, #0d1b2a 0%, #0b1120 40%, #070d1a 100%);color:var(--text);font-family:Poppins,Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial;}
 
     header{max-width:1100px;margin:22px auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 14px}
     h1{margin:0;font-size:24px;font-weight:800}
     .controls{display:flex;gap:10px;flex-wrap:wrap}
-    .btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:8px}
+    .btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:transform .08s ease, box-shadow .2s ease}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.35)}
     .btn-blue{background:#0ea5e9;color:#001826}
     .btn-red{background:#b91c1c;color:#fff}
     .btn-ghost{background:#111827;color:var(--text);border:1px solid #293241}
 
-    .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 320px;gap:18px;padding:0 14px 30px}
+    .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:18px;padding:0 14px 30px}
 
     .new-card{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:14px}
-    .form-row{display:flex;gap:10px;align-items:center}
-    .form-row input{flex:1;min-width:0;background:#0b1220;border:1px solid #293241;color:var(--text);padding:12px;border-radius:12px}
+    .form-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .form-row input{flex:1;min-width:180px;background:#0b1220;border:1px solid #293241;color:var(--text);padding:12px;border-radius:12px}
     .form-row input.small{width:120px}
     .tip{margin-top:8px;color:var(--muted);font-size:12px}
 
-    .right{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:14px;height:max-content}
-    .stat{display:flex;justify-content:space-between;margin:6px 0;color:var(--muted)}
-    .side-actions{display:flex;gap:10px;margin-top:8px}
-    .side-actions .btn{padding:8px 12px;border-radius:10px;background:#e5e7eb;color:#111}
-
     .day-title{margin:18px 0 10px;font-weight:800;color:#fbbf24}
 
-    .card{background:linear-gradient(180deg,#0b1220,#0f1625);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:14px;margin-bottom:12px}
+    .card{background:linear-gradient(180deg,#0b1220,#0f1625);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+    .card.running{box-shadow:0 0 0 2px rgba(34,197,94,.25), 0 12px 26px rgba(0,0,0,.35)}
     .title{font-size:16px;font-weight:800;margin:0}
     .meta{color:var(--muted);font-size:12px;margin-top:2px}
 
-    .pills{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+    .pills{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
     .pill{padding:8px 12px;border-radius:999px;font-weight:800;font-size:13px;border:1px solid rgba(255,255,255,0.06);display:inline-flex;align-items:center;gap:8px}
     .amber{background:linear-gradient(90deg,#3a2000,#5c3900);color:#ffe8b3}
     .green{background:linear-gradient(90deg,#052e16,#0b4a2e);color:#ccffe1}
     .gray{background:linear-gradient(90deg,#0e1726,#121c2e);color:#cfd8e3}
     .failed{background:linear-gradient(90deg,#3b0a0a,#5d1717);color:#ffdede}
 
-    .actions{display:flex;gap:10px;flex-wrap:wrap}
-    .action{border:1px solid #2a3446;background:#121a29;color:var(--text);padding:10px 12px;border-radius:12px;font-weight:800;display:inline-flex;align-items:center;gap:8px}
-    .action.start{background:#16a34a;color:#06250f}
-    .action.done{background:#22c55e;color:#06250f}
-    .action.delete{background:#ef4444;color:white}
+    .row-inline{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
-    @media (max-width:980px){ .container{grid-template-columns:1fr} header{flex-direction:column;align-items:flex-start} }
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+    .action{border:1px solid #2a3446;background:#121a29;color:var(--text);padding:10px 12px;border-radius:12px;font-weight:800;display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:transform .08s ease, box-shadow .2s ease}
+    .action:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.35)}
+    .action.start{background:linear-gradient(90deg,#16a34a,#22c55e);color:#06250f}
+    .action.pause{background:linear-gradient(90deg,#f59e0b,#fbbf24);color:#1f1200}
+    .action.resume{background:linear-gradient(90deg,#22c55e,#86efac);color:#052e16}
+    .action.done{background:linear-gradient(90deg,#22c55e,#86efac);color:#052e16}
+    .action.delete{background:linear-gradient(90deg,#ef4444,#f87171);color:white}
+
+    @media (min-width:980px){ .container{grid-template-columns:1fr 320px} }
   </style>
 </head>
 <body>
@@ -82,14 +85,14 @@
       <div id="days"></div>
     </section>
 
-    <aside class="right">
-      <div class="stat"><span>Total tasks</span><span id="statTotal">0</span></div>
-      <div class="stat"><span>Running</span><span id="statRunning">0</span></div>
-      <div class="stat"><span>Failed</span><span id="statFailed">0</span></div>
-      <div class="side-actions">
-        <button id="exportBtn" class="btn">📤 Export</button>
-        <button id="importBtn" class="btn">📥 Import</button>
+    <aside class="new-card" style="height:max-content">
+      <div class="row-inline" style="justify-content:space-between; width:100%">
+        <div>📊 <b>Stats</b></div>
+        <div id="statNow" class="meta"></div>
       </div>
+      <div class="row-inline" style="justify-content:space-between"><span class="meta">Total</span><b id="statTotal">0</b></div>
+      <div class="row-inline" style="justify-content:space-between"><span class="meta">Running</span><b id="statRunning">0</b></div>
+      <div class="row-inline" style="justify-content:space-between"><span class="meta">Failed</span><b id="statFailed">0</b></div>
     </aside>
   </div>
 
@@ -101,7 +104,7 @@
     // ===== Utilities =====
     const $ = (s) => document.querySelector(s);
     const daysEl = $('#days');
-    const STORE = 'dp.v3.tasks';
+    const STORE = 'dp.v4.tasks';
     const fmt2 = (n) => String(n).padStart(2,'0');
     const fmtClock = (s) => { s=Math.max(0,Math.floor(s)); const m=Math.floor(s/60), sec=s%60; return `${fmt2(m)}:${fmt2(sec)}`; };
     const dayKey = (ms) => new Date(ms).toLocaleDateString();
@@ -113,21 +116,23 @@
 
     function save(){ localStorage.setItem(STORE, JSON.stringify(tasks)); }
 
-    // Task object: {id,title,duration,createdAt,status,startedAt,elapsedBase,startAt,alarm}
+    // Task object: {id,title,duration,createdAt,status,startedAt,firstStartedAt,elapsedBase,startAt,alarm}
 
     function addTask(){
       const title = ($('#titleInput').value || '').trim() || 'Untitled task';
       const mins = parseInt($('#minsInput').value,10); const durationSec = (isFinite(mins) && mins>0) ? mins*60 : 60;
       let startAt = $('#startInput').value ? Date.parse($('#startInput').value) : null; if(Number.isNaN(startAt)) startAt=null;
-      const t = { id: uid(), title, duration: durationSec, createdAt: Date.now(), status:'idle', startedAt:null, elapsedBase:0, startAt, alarm:false };
+      const t = { id: uid(), title, duration: durationSec, createdAt: Date.now(), status:'idle', startedAt:null, firstStartedAt:null, elapsedBase:0, startAt, alarm:false };
       tasks.push(t); save();
       // clear inputs
       $('#titleInput').value=''; $('#minsInput').value='25'; $('#startInput').value='';
       render();
     }
 
-    function startTask(id){ const t = tasks.find(x=>x.id===id); if(!t || t.status==='done') return; if(t.status!=='running'){ t.status='running'; t.startedAt=Date.now(); save(); render(); } }
-    function resetTask(id){ const t=tasks.find(x=>x.id===id); if(!t) return; t.status='idle'; t.startedAt=null; t.elapsedBase=0; t.alarm=false; stopAlarm(); save(); render(); }
+    function startTask(id){ const t = tasks.find(x=>x.id===id); if(!t || t.status==='done') return; if(t.status!=='running'){ t.status='running'; t.startedAt=Date.now(); if(!t.firstStartedAt) t.firstStartedAt=t.startedAt; save(); render(); } }
+    function pauseTask(id){ const t=tasks.find(x=>x.id===id); if(!t || t.status!=='running') return; t.elapsedBase = elapsedSec(t); t.status='paused'; t.startedAt=null; save(); render(); }
+    function resumeTask(id){ const t=tasks.find(x=>x.id===id); if(!t || t.status!=='paused') return; t.status='running'; t.startedAt=Date.now(); save(); render(); }
+    function resetTask(id){ const t=tasks.find(x=>x.id===id); if(!t) return; t.status='idle'; t.startedAt=null; t.firstStartedAt=null; t.elapsedBase=0; t.alarm=false; stopAlarm(); save(); render(); }
     function doneTask(id){ const t=tasks.find(x=>x.id===id); if(!t) return; t.status='done'; t.alarm=false; stopAlarm(); save(); render(); }
     function deleteTask(id){ tasks = tasks.filter(x=>x.id!==id); stopAlarm(); save(); render(); }
     function editTask(id){ const t=tasks.find(x=>x.id===id); if(!t) return; const nt = prompt('Edit title', t.title); if(nt!==null && nt.trim()!=='') t.title=nt.trim(); let nm = prompt('Time limit (minutes)', Math.ceil(t.duration/60)); if(nm!==null){ nm = parseInt(nm,10); if(isFinite(nm) && nm>0){ const el = elapsedSec(t); t.duration = nm*60; t.elapsedBase = Math.min(el, t.duration); if(t.status==='running') t.startedAt = Date.now(); } }
@@ -147,44 +152,56 @@
 
     // ===== Render =====
     function render(){
+      $('#statNow').textContent = new Date().toLocaleString();
       // auto-start for scheduled tasks
       const now = Date.now();
       for(const t of tasks){ if(t.status==='idle' && t.startAt && now>=t.startAt){ startTask(t.id); } }
 
       // expire running
-      let anyAlarm=false; for(const t of tasks){ if(t.status==='running' && remainingSec(t)<=0){ t.status='failed'; t.alarm=true; anyAlarm=true; } }
-      if(anyAlarm) startAlarm(); else { const stillAlarm = tasks.some(x=>x.alarm); if(!stillAlarm) stopAlarm(); }
+      let anyAlarm=false; for(const t of tasks){ if(t.status==='running' && remainingSec(t)<=0){ t.status='failed'; t.alarm=true; } }
+      if(tasks.some(x=>x.alarm)) anyAlarm=true; if(anyAlarm) startAlarm(); else stopAlarm();
 
       // group by day
       const groups = {}; for(const t of tasks){ const k=dayKey(t.createdAt); (groups[k] ||= []).push(t); }
-      // sort groups by date desc and tasks by createdAt asc
       const orderedDays = Object.keys(groups).sort((a,b)=> new Date(b)-new Date(a));
       daysEl.innerHTML='';
       for(const dk of orderedDays){
         const section = document.createElement('div');
         const title = document.createElement('div'); title.className='day-title'; title.textContent = dk; section.appendChild(title);
         for(const t of groups[dk]){
-          const card = document.createElement('div'); card.className='card';
+          const card = document.createElement('div'); card.className='card'+(t.status==='running'?' running':'');
           const title = document.createElement('div'); title.className='title'; title.textContent = t.title; card.appendChild(title);
           const meta = document.createElement('div'); meta.className='meta'; meta.textContent = new Date(t.createdAt).toLocaleString(); card.appendChild(meta);
+          if(t.firstStartedAt){ const s = document.createElement('div'); s.className='meta'; s.textContent = 'Started: '+new Date(t.firstStartedAt).toLocaleTimeString(); card.appendChild(s); }
 
+          // inline figures near primary button (as requested)
+          const inline = document.createElement('div'); inline.className='row-inline';
+          const figRem = document.createElement('span'); figRem.className='pill amber'; figRem.innerHTML = '⏳ <b>Remaining</b> '+fmtClock(remainingSec(t));
+          const figEl = document.createElement('span'); figEl.className='pill green'; figEl.innerHTML = '⏱ <b>Elapsed</b> '+fmtClock(elapsedSec(t));
+
+          const primaryBtn = document.createElement('button');
+          if(t.status==='idle'){ primaryBtn.className='action start'; primaryBtn.innerHTML='▶️ Start'; primaryBtn.onclick=()=>startTask(t.id); }
+          else if(t.status==='running'){ primaryBtn.className='action pause'; primaryBtn.innerHTML='⏸️ Pause'; primaryBtn.onclick=()=>pauseTask(t.id); }
+          else if(t.status==='paused'){ primaryBtn.className='action resume'; primaryBtn.innerHTML='⏯️ Resume'; primaryBtn.onclick=()=>resumeTask(t.id); }
+          else { primaryBtn.className='action'; primaryBtn.innerHTML='⏹️ Stopped'; primaryBtn.disabled=true; }
+
+          inline.append(figRem, figEl, primaryBtn);
+          card.appendChild(inline);
+
+          // pills row
           const pills = document.createElement('div'); pills.className='pills';
-          const pRem = document.createElement('span'); pRem.className='pill amber'; pRem.innerHTML = '⏳ <b>Remaining:</b> '+fmtClock(remainingSec(t));
-          const pEl = document.createElement('span'); pEl.className='pill green'; pEl.innerHTML = '⏱ <b>Elapsed:</b> '+fmtClock(elapsedSec(t));
-          const pLim = document.createElement('span'); pLim.className='pill gray'; pLim.innerHTML = '🎯 <b>Limit:</b> '+fmtClock(t.duration);
-          pills.append(pRem,pEl,pLim);
+          const pLim = document.createElement('span'); pLim.className='pill gray'; pLim.innerHTML = '🎯 <b>Limit</b> '+fmtClock(t.duration);
+          pills.append(pLim);
           if(t.status==='failed'){ const pFail = document.createElement('span'); pFail.className='pill failed'; pFail.innerHTML='📌 <b>FAILED</b>'; pills.append(pFail); }
           card.appendChild(pills);
 
-          if(t.startedAt){ const s = document.createElement('div'); s.className='meta'; s.textContent = 'Started: '+new Date(t.startedAt).toLocaleTimeString(); card.appendChild(s); }
-
+          // actions row
           const actions = document.createElement('div'); actions.className='actions';
-          if(t.status==='idle'){ const b=document.createElement('button'); b.className='action start'; b.innerHTML='▶️ Start'; b.onclick=()=>startTask(t.id); actions.appendChild(b); }
-          if(t.status==='failed' && t.alarm){ const b=document.createElement('button'); b.className='action'; b.innerHTML='🔇 Stop Alarm'; b.onclick=()=>{ t.alarm=false; stopAlarm(); save(); render(); }; actions.appendChild(b); }
           const bReset=document.createElement('button'); bReset.className='action'; bReset.innerHTML='↺ Reset'; bReset.onclick=()=>resetTask(t.id); actions.appendChild(bReset);
           const bDone=document.createElement('button'); bDone.className='action done'; bDone.innerHTML='✅ Done'; bDone.onclick=()=>doneTask(t.id); actions.appendChild(bDone);
           const bEdit=document.createElement('button'); bEdit.className='action'; bEdit.innerHTML='✏️ Edit'; bEdit.onclick=()=>editTask(t.id); actions.appendChild(bEdit);
           const bDel=document.createElement('button'); bDel.className='action delete'; bDel.innerHTML='🗑️ Delete'; bDel.onclick=()=>deleteTask(t.id); actions.appendChild(bDel);
+          if(t.status==='failed' && t.alarm){ const bStop=document.createElement('button'); bStop.className='action'; bStop.innerHTML='🔇 Stop Alarm'; bStop.onclick=()=>{ t.alarm=false; stopAlarm(); save(); render(); }; actions.appendChild(bStop); }
 
           card.appendChild(actions);
           section.appendChild(card);
@@ -200,14 +217,10 @@
       save();
     }
 
-    // ===== Wire up buttons (fixes Add button not working) =====
-    $('#addBtn').addEventListener('click', addTask); // ensure type=button in HTML
+    // ===== Wire up buttons =====
+    $('#addBtn').addEventListener('click', addTask);
     $('#soundBtn').addEventListener('click', enableSound);
     $('#clearAllBtn').addEventListener('click', ()=>{ if(confirm('Delete ALL tasks?')){ tasks=[]; stopAlarm(); save(); render(); } });
-
-    // Export/Import
-    $('#exportBtn').addEventListener('click', ()=>{ const blob = new Blob([JSON.stringify(tasks,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='day-planner-backup.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); });
-    $('#importBtn').addEventListener('click', ()=>{ const inp=document.createElement('input'); inp.type='file'; inp.accept='application/json'; inp.onchange=(e)=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const data=JSON.parse(r.result); if(Array.isArray(data)){ tasks=data; save(); render(); alert('Imported'); } else alert('Invalid file'); }catch(err){ alert('Invalid JSON'); } }; r.readAsText(f); }; inp.click(); });
 
     // tick
     setInterval(render, 1000);
