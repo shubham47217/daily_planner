@@ -2,229 +2,262 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Day Planner 🕒 — Plan Tasks, Grouped by Day</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day Planner</title>
   <style>
-    :root{
-      --bg:#0b1120; --panel:#0f172a; --card:#0b1220; --muted:#9aa4b2; --text:#e6edf6;
-      --green:#22c55e; --green-2:#16a34a; --red:#ef4444; --amber:#f59e0b; --cyan:#06b6d4; --stone:#334155;
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:radial-gradient(1200px 800px at 10% -10%, #0d1b2a 0%, #0b1120 40%, #070d1a 100%);color:var(--text);font-family:Poppins,Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial;}
-
-    header{max-width:1100px;margin:22px auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 14px}
-    h1{margin:0;font-size:24px;font-weight:800}
-    .controls{display:flex;gap:10px;flex-wrap:wrap}
-    .btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:transform .08s ease, box-shadow .2s ease}
-    .btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.35)}
-    .btn-blue{background:#0ea5e9;color:#001826}
-    .btn-red{background:#b91c1c;color:#fff}
-    .btn-ghost{background:#111827;color:var(--text);border:1px solid #293241}
-
-    .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:18px;padding:0 14px 30px}
-
-    .new-card{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:14px}
-    .form-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .form-row input{flex:1;min-width:180px;background:#0b1220;border:1px solid #293241;color:var(--text);padding:12px;border-radius:12px}
-    .form-row input.small{width:120px}
-    .tip{margin-top:8px;color:var(--muted);font-size:12px}
-
-    .day-title{margin:18px 0 10px;font-weight:800;color:#fbbf24}
-
-    .card{background:linear-gradient(180deg,#0b1220,#0f1625);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
-    .card.running{box-shadow:0 0 0 2px rgba(34,197,94,.25), 0 12px 26px rgba(0,0,0,.35)}
-    .title{font-size:16px;font-weight:800;margin:0}
-    .meta{color:var(--muted);font-size:12px;margin-top:2px}
-
-    .pills{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
-    .pill{padding:8px 12px;border-radius:999px;font-weight:800;font-size:13px;border:1px solid rgba(255,255,255,0.06);display:inline-flex;align-items:center;gap:8px}
-    .amber{background:linear-gradient(90deg,#3a2000,#5c3900);color:#ffe8b3}
-    .green{background:linear-gradient(90deg,#052e16,#0b4a2e);color:#ccffe1}
-    .gray{background:linear-gradient(90deg,#0e1726,#121c2e);color:#cfd8e3}
-    .failed{background:linear-gradient(90deg,#3b0a0a,#5d1717);color:#ffdede}
-
-    .row-inline{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-
-    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
-    .action{border:1px solid #2a3446;background:#121a29;color:var(--text);padding:10px 12px;border-radius:12px;font-weight:800;display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:transform .08s ease, box-shadow .2s ease}
-    .action:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.35)}
-    .action.start{background:linear-gradient(90deg,#16a34a,#22c55e);color:#06250f}
-    .action.pause{background:linear-gradient(90deg,#f59e0b,#fbbf24);color:#1f1200}
-    .action.resume{background:linear-gradient(90deg,#22c55e,#86efac);color:#052e16}
-    .action.done{background:linear-gradient(90deg,#22c55e,#86efac);color:#052e16}
-    .action.delete{background:linear-gradient(90deg,#ef4444,#f87171);color:white}
-
-    @media (min-width:980px){ .container{grid-template-columns:1fr 320px} }
+    .container {
+      width: 100%;
+      max-width: 800px;
+    }
+    h1 {
+      text-align: center;
+      color: #00e0ff;
+      text-shadow: 0 0 12px #00e0ff;
+      margin-bottom: 20px;
+    }
+    .task-input {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      background: #111;
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 224, 255, 0.2);
+    }
+    .task-input input, .task-input button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+    .task-input input {
+      background: #1f1f1f;
+      color: #fff;
+    }
+    .task-input button {
+      background: linear-gradient(135deg, #00e0ff, #0088ff);
+      color: white;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .task-input button:hover {
+      transform: scale(1.05);
+    }
+    .day-group {
+      margin-bottom: 25px;
+    }
+    .day-title {
+      font-size: 18px;
+      color: #ff4081;
+      margin-bottom: 10px;
+      text-shadow: 0 0 8px #ff4081;
+    }
+    .task {
+      background: #181818;
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 12px;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+      transition: transform 0.2s;
+    }
+    .task:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 18px rgba(0, 224, 255, 0.25);
+    }
+    .task-title {
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+    .task-details {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-bottom: 10px;
+    }
+    .controls button {
+      margin-right: 8px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      transition: transform 0.2s;
+    }
+    .controls button:hover {
+      transform: scale(1.08);
+    }
+    .start { background: #00c853; box-shadow: 0 0 10px #00c853; }
+    .pause { background: #ff9800; box-shadow: 0 0 10px #ff9800; }
+    .resume { background: #2196f3; box-shadow: 0 0 10px #2196f3; }
+    .reset { background: #9c27b0; box-shadow: 0 0 10px #9c27b0; }
+    .done { background: #4caf50; box-shadow: 0 0 10px #4caf50; }
+    .delete { background: #f44336; box-shadow: 0 0 10px #f44336; }
+    .edit { background: #607d8b; box-shadow: 0 0 10px #607d8b; }
+    .stop-alarm { background: #ff1744; box-shadow: 0 0 10px #ff1744; }
+    .status {
+      display: inline-block;
+      margin-left: 10px;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .active { background: #00c853; color: #fff; }
+    .failed { background: #f44336; color: #fff; }
+    .info {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #ccc;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Day Planner 🕒 — Plan Tasks, Grouped by Day</h1>
-    <div class="controls">
-      <button id="soundBtn" class="btn btn-blue">🔊 Enable Loud Alarm</button>
-      <button id="clearAllBtn" class="btn btn-red">🧹 Clear All</button>
-    </div>
-  </header>
-
   <div class="container">
-    <section>
-      <div class="new-card">
-        <div class="form-row" style="margin-bottom:10px">
-          <input id="titleInput" type="text" placeholder="Task title (optional)" />
-          <input id="minsInput" class="small" type="number" min="1" value="25" placeholder="Minutes" />
-          <button id="addBtn" class="btn btn-ghost" type="button">➕ Add Task</button>
-        </div>
-        <div class="form-row">
-          <input id="startInput" type="datetime-local" placeholder="dd-mm-yyyy  --:--" />
-        </div>
-        <div class="tip">If you provide a start time the task will auto-start at that time. Otherwise press <b>Start</b> on the task card to begin.</div>
-      </div>
-
-      <div id="days"></div>
-    </section>
-
-    <aside class="new-card" style="height:max-content">
-      <div class="row-inline" style="justify-content:space-between; width:100%">
-        <div>📊 <b>Stats</b></div>
-        <div id="statNow" class="meta"></div>
-      </div>
-      <div class="row-inline" style="justify-content:space-between"><span class="meta">Total</span><b id="statTotal">0</b></div>
-      <div class="row-inline" style="justify-content:space-between"><span class="meta">Running</span><b id="statRunning">0</b></div>
-      <div class="row-inline" style="justify-content:space-between"><span class="meta">Failed</span><b id="statFailed">0</b></div>
-    </aside>
+    <h1>⏰ Day Planner</h1>
+    <div class="task-input">
+      <input type="text" id="taskTitle" placeholder="Task title (optional)">
+      <input type="number" id="taskLimit" placeholder="Time limit (mins)">
+      <button onclick="addTask()">Add Task ➕</button>
+    </div>
+    <div id="tasks"></div>
+    <audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
   </div>
 
-  <audio id="beep">
-    <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg" />
-  </audio>
-
   <script>
-    // ===== Utilities =====
-    const $ = (s) => document.querySelector(s);
-    const daysEl = $('#days');
-    const STORE = 'dp.v4.tasks';
-    const fmt2 = (n) => String(n).padStart(2,'0');
-    const fmtClock = (s) => { s=Math.max(0,Math.floor(s)); const m=Math.floor(s/60), sec=s%60; return `${fmt2(m)}:${fmt2(sec)}`; };
-    const dayKey = (ms) => new Date(ms).toLocaleDateString();
+    let tasks = [];
+    let alarmTimeout;
 
-    function uid(){return Math.random().toString(36).slice(2,9)}
-
-    // ===== Data =====
-    let tasks = JSON.parse(localStorage.getItem(STORE) || '[]');
-
-    function save(){ localStorage.setItem(STORE, JSON.stringify(tasks)); }
-
-    // Task object: {id,title,duration,createdAt,status,startedAt,firstStartedAt,elapsedBase,startAt,alarm}
-
-    function addTask(){
-      const title = ($('#titleInput').value || '').trim() || 'Untitled task';
-      const mins = parseInt($('#minsInput').value,10); const durationSec = (isFinite(mins) && mins>0) ? mins*60 : 60;
-      let startAt = $('#startInput').value ? Date.parse($('#startInput').value) : null; if(Number.isNaN(startAt)) startAt=null;
-      const t = { id: uid(), title, duration: durationSec, createdAt: Date.now(), status:'idle', startedAt:null, firstStartedAt:null, elapsedBase:0, startAt, alarm:false };
-      tasks.push(t); save();
-      // clear inputs
-      $('#titleInput').value=''; $('#minsInput').value='25'; $('#startInput').value='';
-      render();
+    function addTask() {
+      const title = document.getElementById('taskTitle').value || "Untitled Task";
+      const limit = parseInt(document.getElementById('taskLimit').value) || 1;
+      const date = new Date().toLocaleDateString();
+      const task = { id: Date.now(), title, limit: limit*60, remaining: limit*60, started: null, running: false, failed: false };
+      tasks.push(task);
+      renderTasks();
+      document.getElementById('taskTitle').value = '';
+      document.getElementById('taskLimit').value = '';
     }
 
-    function startTask(id){ const t = tasks.find(x=>x.id===id); if(!t || t.status==='done') return; if(t.status!=='running'){ t.status='running'; t.startedAt=Date.now(); if(!t.firstStartedAt) t.firstStartedAt=t.startedAt; save(); render(); } }
-    function pauseTask(id){ const t=tasks.find(x=>x.id===id); if(!t || t.status!=='running') return; t.elapsedBase = elapsedSec(t); t.status='paused'; t.startedAt=null; save(); render(); }
-    function resumeTask(id){ const t=tasks.find(x=>x.id===id); if(!t || t.status!=='paused') return; t.status='running'; t.startedAt=Date.now(); save(); render(); }
-    function resetTask(id){ const t=tasks.find(x=>x.id===id); if(!t) return; t.status='idle'; t.startedAt=null; t.firstStartedAt=null; t.elapsedBase=0; t.alarm=false; stopAlarm(); save(); render(); }
-    function doneTask(id){ const t=tasks.find(x=>x.id===id); if(!t) return; t.status='done'; t.alarm=false; stopAlarm(); save(); render(); }
-    function deleteTask(id){ tasks = tasks.filter(x=>x.id!==id); stopAlarm(); save(); render(); }
-    function editTask(id){ const t=tasks.find(x=>x.id===id); if(!t) return; const nt = prompt('Edit title', t.title); if(nt!==null && nt.trim()!=='') t.title=nt.trim(); let nm = prompt('Time limit (minutes)', Math.ceil(t.duration/60)); if(nm!==null){ nm = parseInt(nm,10); if(isFinite(nm) && nm>0){ const el = elapsedSec(t); t.duration = nm*60; t.elapsedBase = Math.min(el, t.duration); if(t.status==='running') t.startedAt = Date.now(); } }
-      save(); render(); }
+    function renderTasks() {
+      const container = document.getElementById('tasks');
+      container.innerHTML = '';
+      const groups = {};
+      tasks.forEach(t => {
+        const date = new Date(t.id).toLocaleDateString();
+        if (!groups[date]) groups[date] = [];
+        groups[date].push(t);
+      });
 
-    function elapsedSec(t){ if(t.status==='running') return t.elapsedBase + Math.floor((Date.now()-t.startedAt)/1000); return t.elapsedBase; }
-    function remainingSec(t){ return Math.max(0, t.duration - elapsedSec(t)); }
-
-    // ===== Alarm =====
-    let audioCtx=null, alarmOsc=null, alarmGain=null; let alarmTimer=null; let soundReady=false; const beepEl = $('#beep');
-    function enableSound(){ if(soundReady) return; try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); soundReady=true; $('#soundBtn').textContent='🔊 Alarm Ready'; }catch(e){ console.warn(e); }
-      // prime fallback
-      beepEl.play().then(()=>{beepEl.pause();beepEl.currentTime=0;}).catch(()=>{});
-    }
-    function startAlarm(){ if(audioCtx){ if(alarmOsc) return; alarmOsc=audioCtx.createOscillator(); alarmGain=audioCtx.createGain(); alarmOsc.type='square'; alarmOsc.frequency.value=900; alarmGain.gain.value=0.17; alarmOsc.connect(alarmGain).connect(audioCtx.destination); alarmOsc.start(); } else { try{ beepEl.loop=true; beepEl.play(); }catch(e){} } clearTimeout(alarmTimer); alarmTimer=setTimeout(stopAlarm, 120000); }
-    function stopAlarm(){ if(alarmOsc){ try{ alarmOsc.stop(); }catch(e){} alarmOsc.disconnect(); alarmGain.disconnect(); alarmOsc=null; alarmGain=null; } try{ beepEl.loop=false; beepEl.pause(); beepEl.currentTime=0; }catch(e){} clearTimeout(alarmTimer); }
-
-    // ===== Render =====
-    function render(){
-      $('#statNow').textContent = new Date().toLocaleString();
-      // auto-start for scheduled tasks
-      const now = Date.now();
-      for(const t of tasks){ if(t.status==='idle' && t.startAt && now>=t.startAt){ startTask(t.id); } }
-
-      // expire running
-      let anyAlarm=false; for(const t of tasks){ if(t.status==='running' && remainingSec(t)<=0){ t.status='failed'; t.alarm=true; } }
-      if(tasks.some(x=>x.alarm)) anyAlarm=true; if(anyAlarm) startAlarm(); else stopAlarm();
-
-      // group by day
-      const groups = {}; for(const t of tasks){ const k=dayKey(t.createdAt); (groups[k] ||= []).push(t); }
-      const orderedDays = Object.keys(groups).sort((a,b)=> new Date(b)-new Date(a));
-      daysEl.innerHTML='';
-      for(const dk of orderedDays){
-        const section = document.createElement('div');
-        const title = document.createElement('div'); title.className='day-title'; title.textContent = dk; section.appendChild(title);
-        for(const t of groups[dk]){
-          const card = document.createElement('div'); card.className='card'+(t.status==='running'?' running':'');
-          const title = document.createElement('div'); title.className='title'; title.textContent = t.title; card.appendChild(title);
-          const meta = document.createElement('div'); meta.className='meta'; meta.textContent = new Date(t.createdAt).toLocaleString(); card.appendChild(meta);
-          if(t.firstStartedAt){ const s = document.createElement('div'); s.className='meta'; s.textContent = 'Started: '+new Date(t.firstStartedAt).toLocaleTimeString(); card.appendChild(s); }
-
-          // inline figures near primary button (as requested)
-          const inline = document.createElement('div'); inline.className='row-inline';
-          const figRem = document.createElement('span'); figRem.className='pill amber'; figRem.innerHTML = '⏳ <b>Remaining</b> '+fmtClock(remainingSec(t));
-          const figEl = document.createElement('span'); figEl.className='pill green'; figEl.innerHTML = '⏱ <b>Elapsed</b> '+fmtClock(elapsedSec(t));
-
-          const primaryBtn = document.createElement('button');
-          if(t.status==='idle'){ primaryBtn.className='action start'; primaryBtn.innerHTML='▶️ Start'; primaryBtn.onclick=()=>startTask(t.id); }
-          else if(t.status==='running'){ primaryBtn.className='action pause'; primaryBtn.innerHTML='⏸️ Pause'; primaryBtn.onclick=()=>pauseTask(t.id); }
-          else if(t.status==='paused'){ primaryBtn.className='action resume'; primaryBtn.innerHTML='⏯️ Resume'; primaryBtn.onclick=()=>resumeTask(t.id); }
-          else { primaryBtn.className='action'; primaryBtn.innerHTML='⏹️ Stopped'; primaryBtn.disabled=true; }
-
-          inline.append(figRem, figEl, primaryBtn);
-          card.appendChild(inline);
-
-          // pills row
-          const pills = document.createElement('div'); pills.className='pills';
-          const pLim = document.createElement('span'); pLim.className='pill gray'; pLim.innerHTML = '🎯 <b>Limit</b> '+fmtClock(t.duration);
-          pills.append(pLim);
-          if(t.status==='failed'){ const pFail = document.createElement('span'); pFail.className='pill failed'; pFail.innerHTML='📌 <b>FAILED</b>'; pills.append(pFail); }
-          card.appendChild(pills);
-
-          // actions row
-          const actions = document.createElement('div'); actions.className='actions';
-          const bReset=document.createElement('button'); bReset.className='action'; bReset.innerHTML='↺ Reset'; bReset.onclick=()=>resetTask(t.id); actions.appendChild(bReset);
-          const bDone=document.createElement('button'); bDone.className='action done'; bDone.innerHTML='✅ Done'; bDone.onclick=()=>doneTask(t.id); actions.appendChild(bDone);
-          const bEdit=document.createElement('button'); bEdit.className='action'; bEdit.innerHTML='✏️ Edit'; bEdit.onclick=()=>editTask(t.id); actions.appendChild(bEdit);
-          const bDel=document.createElement('button'); bDel.className='action delete'; bDel.innerHTML='🗑️ Delete'; bDel.onclick=()=>deleteTask(t.id); actions.appendChild(bDel);
-          if(t.status==='failed' && t.alarm){ const bStop=document.createElement('button'); bStop.className='action'; bStop.innerHTML='🔇 Stop Alarm'; bStop.onclick=()=>{ t.alarm=false; stopAlarm(); save(); render(); }; actions.appendChild(bStop); }
-
-          card.appendChild(actions);
-          section.appendChild(card);
-        }
-        daysEl.appendChild(section);
+      for (let date in groups) {
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'day-group';
+        const title = document.createElement('div');
+        title.className = 'day-title';
+        title.textContent = date;
+        dayDiv.appendChild(title);
+        groups[date].forEach(task => {
+          const div = document.createElement('div');
+          div.className = 'task';
+          div.innerHTML = `
+            <div class="task-title">${task.title} ${task.failed ? '<span class="status failed">FAILED</span>' : task.running ? '<span class="status active">ACTIVE</span>' : ''}</div>
+            <div class="task-details">Limit: ${Math.round(task.limit/60)} mins</div>
+            <div class="info">Started: ${task.started ? new Date(task.started).toLocaleTimeString() : 'Not started'}</div>
+            <div class="info">Remaining: ${formatTime(task.remaining)} | Elapsed: ${formatTime(task.limit-task.remaining)}</div>
+            <div class="controls">
+              ${!task.running && !task.failed && task.remaining>0 ? `<button class="start" onclick="startTask(${task.id})">Start</button>` : ''}
+              ${task.running ? `<button class="pause" onclick="pauseTask(${task.id})">Pause</button>` : ''}
+              ${!task.running && task.remaining < task.limit && task.remaining>0 ? `<button class="resume" onclick="resumeTask(${task.id})">Resume</button>` : ''}
+              <button class="reset" onclick="resetTask(${task.id})">Reset</button>
+              <button class="done" onclick="doneTask(${task.id})">Done</button>
+              <button class="edit" onclick="editTask(${task.id})">Edit</button>
+              <button class="delete" onclick="deleteTask(${task.id})">Delete</button>
+              ${task.failed ? '<button class="stop-alarm" onclick="stopAlarm()">Stop Alarm</button>' : ''}
+            </div>
+          `;
+          dayDiv.appendChild(div);
+        });
+        container.appendChild(dayDiv);
       }
-
-      // stats
-      $('#statTotal').textContent = tasks.length;
-      $('#statRunning').textContent = tasks.filter(t=>t.status==='running').length;
-      $('#statFailed').textContent = tasks.filter(t=>t.status==='failed').length;
-
-      save();
     }
 
-    // ===== Wire up buttons =====
-    $('#addBtn').addEventListener('click', addTask);
-    $('#soundBtn').addEventListener('click', enableSound);
-    $('#clearAllBtn').addEventListener('click', ()=>{ if(confirm('Delete ALL tasks?')){ tasks=[]; stopAlarm(); save(); render(); } });
-
-    // tick
-    setInterval(render, 1000);
-    render();
+    function startTask(id) {
+      const task = tasks.find(t => t.id===id);
+      if (!task) return;
+      task.running = true;
+      if (!task.started) task.started = Date.now();
+      task.timer = setInterval(()=>tick(task),1000);
+      renderTasks();
+    }
+    function pauseTask(id) {
+      const task = tasks.find(t => t.id===id);
+      if (!task) return;
+      task.running = false;
+      clearInterval(task.timer);
+      renderTasks();
+    }
+    function resumeTask(id) { startTask(id); }
+    function resetTask(id) {
+      const task = tasks.find(t => t.id===id);
+      if (!task) return;
+      clearInterval(task.timer);
+      task.remaining = task.limit;
+      task.running = false;
+      task.failed = false;
+      task.started = null;
+      renderTasks();
+    }
+    function doneTask(id) {
+      tasks = tasks.filter(t => t.id!==id);
+      renderTasks();
+    }
+    function deleteTask(id) { doneTask(id); }
+    function editTask(id) {
+      const task = tasks.find(t=>t.id===id);
+      if (!task) return;
+      const newTitle = prompt("Edit title", task.title);
+      if (newTitle!==null) task.title=newTitle;
+      const newLimit = prompt("Edit limit (minutes)", task.limit/60);
+      if (newLimit!==null) { task.limit=newLimit*60; task.remaining=newLimit*60; }
+      renderTasks();
+    }
+    function tick(task) {
+      if (!task.running) return;
+      task.remaining--;
+      if (task.remaining<=0) {
+        clearInterval(task.timer);
+        task.failed=true;
+        task.running=false;
+        playAlarm();
+      }
+      renderTasks();
+    }
+    function formatTime(sec){
+      const m=Math.floor(sec/60);const s=sec%60;return `${m}:${s.toString().padStart(2,'0')}`;
+    }
+    function playAlarm(){
+      const alarm=document.getElementById('alarmSound');
+      alarm.play();
+      alarmTimeout=setTimeout(()=>alarm.pause(),120000);
+    }
+    function stopAlarm(){
+      const alarm=document.getElementById('alarmSound');
+      alarm.pause();
+      alarm.currentTime=0;
+      clearTimeout(alarmTimeout);
+    }
   </script>
 </body>
 </html>
